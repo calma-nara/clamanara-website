@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clama·nara｜每一件，都為妳好好挑過。</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Noto+Serif+TC:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* ── 奶茶色系配色方案 ── */
+    --cream:        #FAF6F1;   /* 背景主色：溫暖米白，如奶泡 */
+    --latte:        #EDE0D0;   /* 次背景：淺奶茶，卡片底色 */
+    --caramel:      #C8A882;   /* 強調/按鈕色：焦糖奶茶，溫潤有質感 */
+    --mocha:        #7A5C44;   /* 深色文字/標題色：深焦糖 */
+    --espresso:     #3D2B1F;   /* 最深：主標題、Logo */
+    --blush:        #E8C4B8;   /* 粉霧強調：現貨按鈕、溫柔焦點 */
+    --sage:         #B5C4B1;   /* 柔綠輔助：預購標籤 */
+    --white:        #FFFFFF;
+    --text-body:    #5C4033;   /* 內文色：深奶茶 */
+    --text-muted:   #A08878;   /* 次要文字 */
+    --border:       #DDD0C0;   /* 邊框 */
+    --shadow:       rgba(122,92,68,0.10);
+
+    --radius-sm: 12px;
+    --radius-md: 20px;
+    --radius-lg: 32px;
+    --radius-full: 999px;
+
+    --font-display: 'Cormorant Garamond', 'Noto Serif TC', serif;
+    --font-body: 'Noto Sans TC', sans-serif;
+    --font-serif: 'Noto Serif TC', serif;
+
+    --transition: 0.3s cubic-bezier(0.25,0.8,0.25,1);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--cream);
+    color: var(--text-body);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ═══════════════════════════════
+     HEADER / NAV
+  ═══════════════════════════════ */
+  .header {
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 0 20px;
+  }
+  .header-inner {
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 62px;
+  }
+  .logo-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .logo-name {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--espresso);
+  }
+  .logo-name span { color: var(--caramel); font-style: italic; }
+  .logo-slogan {
+    font-size: 9.5px;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    font-family: var(--font-serif);
+    font-weight: 300;
+  }
+  .header-icons {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+  }
+  .icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--mocha);
+    font-size: 20px;
+    padding: 4px;
+    position: relative;
+    transition: color var(--transition);
+  }
+  .icon-btn:hover { color: var(--caramel); }
+  .badge {
+    position: absolute;
+    top: 0; right: 0;
+    background: var(--blush);
+    color: var(--espresso);
+    border-radius: 50%;
+    width: 14px; height: 14px;
+    font-size: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 500;
+  }
+
+  /* ═══════════════════════════════
+     HERO BANNER
+  ═══════════════════════════════ */
+  .hero {
+    background: linear-gradient(160deg, var(--latte) 0%, var(--cream) 60%);
+    padding: 36px 20px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--blush) 0%, transparent 70%);
+    opacity: 0.45;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: var(--blush);
+    color: var(--espresso);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    padding: 4px 14px;
+    border-radius: var(--radius-full);
+    margin-bottom: 14px;
+    font-family: var(--font-serif);
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--espresso);
+    line-height: 1.35;
+    margin-bottom: 10px;
+  }
+  .hero-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 22px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+  .hero-btns {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  /* ═══════════════════════════════
+     BUTTONS
+  ═══════════════════════════════ */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 11px 22px;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border: none;
+    transition: all var(--transition);
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--caramel);
+    color: var(--white);
+    box-shadow: 0 4px 16px rgba(200,168,130,0.35);
+  }
+  .btn-primary:hover {
+    background: var(--mocha);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(200,168,130,0.45);
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--caramel);
+    border: 1.5px solid var(--caramel);
+  }
+  .btn-outline:hover {
+    background: var(--latte);
+    transform: translateY(-1px);
+  }
+  .btn-instock {
+    background: var(--blush);
+    color: var(--espresso);
+    border: none;
+    padding: 7px 14px;
+    font-size: 11px;
+    border-radius: var(--radius-full);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .btn-instock:hover { background: #dbaaa0; transform: translateY(-1px); }
+  .btn-preorder {
+    background: var(--sage);
+    color: var(--espresso);
+    border: none;
+    padding: 7px 14px;
+    font-size: 11px;
+    border-radius: var(--radius-full);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition);
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .btn-preorder:hover { background: #9ab59a; transform: translateY(-1px); }
+
+  /* ═══════════════════════════════
+     SECTION LAYOUT
+  ═══════════════════════════════ */
+  .section {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 24px 20px;
+  }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--espresso);
+    letter-spacing: 0.05em;
+  }
+  .section-more {
+    font-size: 12px;
+    color: var(--caramel);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+  }
+  .divider {
+    height: 1px;
+    background: var(--border);
+    max-width: 480px;
+    margin: 0 auto;
+    opacity: 0.6;
+  }
+
+  /* ═══════════════════════════════
+     CATEGORY TABS
+  ═══════════════════════════════ */
+  .cat-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    margin-bottom: 20px;
+    scrollbar-width: none;
+  }
+  .cat-tabs::-webkit-scrollbar { display:none; }
+  .cat-tab {
+    flex-shrink: 0;
+    padding: 7px 16px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    color: var(--text-muted);
+    transition: all var(--transition);
+    letter-spacing: 0.05em;
+  }
+  .cat-tab.active {
+    background: var(--caramel);
+    border-color: var(--caramel);
+    color: var(--white);
+    box-shadow: 0 2px 10px rgba(200,168,130,0.30);
+  }
+
+  /* ═══════════════════════════════
+     PRODUCT GRID
+  ═══════════════════════════════ */
+  .product-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .product-card {
+    background: var(--white);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: 0 2px 12px var(--shadow);
+    transition: all var(--transition);
+    cursor: pointer;
+  }
+  .product-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(122,92,68,0.15);
+  }
+  .product-img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    background: var(--latte);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    position: relative;
+  }
+  .stock-badge {
+    position: absolute;
+    top: 8px; left: 8px;
+    font-size: 9px;
+    padding: 3px 9px;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+  .stock-badge.instock { background: var(--blush); color: var(--espresso); }
+  .stock-badge.preorder { background: var(--sage); color: var(--espresso); }
+  .product-info {
+    padding: 12px 12px 14px;
+  }
+  .product-brand {
+    font-size: 9.5px;
+    color: var(--text-muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .product-name {
+    font-family: var(--font-serif);
+    font-size: 13px;
+    color: var(--espresso);
+    font-weight: 500;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .product-price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .product-price {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--caramel);
+    letter-spacing: 0.02em;
+  }
+
+  /* ═══════════════════════════════
+     PRODUCT DETAIL PAGE
+  ═══════════════════════════════ */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .detail-header {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .back-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--mocha);
+    font-size: 20px;
+    padding: 4px;
+    display: flex;
+  }
+  .detail-page-title {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    color: var(--espresso);
+    font-weight: 500;
+  }
+  .detail-img {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    display: block;
+    aspect-ratio: 1/1;
+    background: linear-gradient(135deg, var(--latte), var(--cream));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 90px;
+  }
+  .detail-body {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px 20px 100px;
+  }
+  .detail-brand { font-size: 10px; color: var(--text-muted); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 4px; }
+  .detail-name { font-family: var(--font-display); font-size: 22px; font-weight: 400; color: var(--espresso); margin-bottom: 6px; line-height: 1.3; }
+  .detail-price { font-size: 20px; color: var(--caramel); font-weight: 500; margin-bottom: 16px; }
+  .detail-badge-row { display: flex; gap: 8px; margin-bottom: 20px; }
+  .detail-desc { font-size: 13.5px; color: var(--text-body); line-height: 1.85; margin-bottom: 22px; }
+  
+  .option-label { font-size: 12px; font-weight: 500; color: var(--mocha); letter-spacing: 0.08em; margin-bottom: 8px; }
+  .option-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .option-chip {
+    padding: 6px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text-body);
+    background: var(--white);
+    transition: all var(--transition);
+  }
+  .option-chip.selected {
+    border-color: var(--caramel);
+    background: var(--latte);
+    color: var(--espresso);
+    font-weight: 500;
+  }
+
+  .shipping-select {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--text-body);
+    background: var(--white);
+    margin-bottom: 20px;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23C8A882' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+  }
+
+  .detail-actions {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    padding: 14px 20px 24px;
+    background: linear-gradient(to top, var(--cream) 85%, transparent);
+    display: flex;
+    gap: 10px;
+  }
+  .detail-actions .btn { flex: 1; justify-content: center; font-size: 14px; padding: 14px; }
+
+  /* ═══════════════════════════════
+     ORDER QUERY PAGE
+  ═══════════════════════════════ */
+  .order-card {
+    background: var(--white);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 10px var(--shadow);
+  }
+  .order-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .order-no { font-size: 11px; color: var(--text-muted); letter-spacing: 0.1em; }
+  .order-date { font-size: 11px; color: var(--text-muted); }
+  .order-status {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+  .status-shipping { background: var(--blush); color: var(--espresso); }
+  .status-pending  { background: #FFF0C8; color: #7A5C00; }
+  .status-done     { background: #D6EDD6; color: #2E6B2E; }
+  .order-items { font-size: 13px; color: var(--text-body); margin-bottom: 10px; }
+  .order-item-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed var(--border); }
+  .order-item-row:last-child { border: none; }
+  .order-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; }
+  .order-total { font-weight: 500; color: var(--caramel); font-size: 15px; }
+  .order-ship { font-size: 11px; color: var(--text-muted); }
+
+  /* ═══════════════════════════════
+     REPORT PAGE
+  ═══════════════════════════════ */
+  .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .report-card {
+    background: var(--white);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    box-shadow: 0 2px 10px var(--shadow);
+    text-align: center;
+  }
+  .report-label { font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; margin-bottom: 6px; }
+  .report-value { font-family: var(--font-display); font-size: 24px; font-weight: 400; color: var(--espresso); }
+  .report-sub { font-size: 10px; color: var(--caramel); margin-top: 2px; }
+
+  .bar-chart { background: var(--white); border-radius: var(--radius-md); padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 10px var(--shadow); }
+  .bar-title { font-family: var(--font-serif); font-size: 13px; color: var(--espresso); margin-bottom: 14px; font-weight: 500; }
+  .bar-item { margin-bottom: 10px; }
+  .bar-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .bar-track { height: 8px; background: var(--latte); border-radius: var(--radius-full); overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: var(--radius-full); background: linear-gradient(90deg, var(--blush), var(--caramel)); transition: width 0.8s cubic-bezier(0.25,0.8,0.25,1); }
+
+  .top-product-list { background: var(--white); border-radius: var(--radius-md); padding: 16px; box-shadow: 0 2px 10px var(--shadow); }
+  .top-product-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .top-product-item:last-child { border: none; }
+  .rank-num { font-family: var(--font-display); font-size: 18px; color: var(--caramel); width: 22px; text-align: center; }
+  .top-product-info { flex: 1; }
+  .top-product-name { font-size: 13px; color: var(--espresso); font-weight: 500; }
+  .top-product-brand { font-size: 10px; color: var(--text-muted); }
+  .top-product-rev { font-size: 13px; color: var(--caramel); font-weight: 500; }
+
+  /* ═══════════════════════════════
+     BOTTOM NAV
+  ═══════════════════════════════ */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: var(--cream);
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 200;
+    padding: 8px 0 16px;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 4px;
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    transition: color var(--transition);
+  }
+  .nav-item.active { color: var(--caramel); }
+  .nav-icon { font-size: 20px; }
+  .nav-label { font-size: 9px; letter-spacing: 0.08em; font-family: var(--font-body); font-weight: 500; }
+
+  /* ═══════════════════════════════
+     ABOUT PAGE
+  ═══════════════════════════════ */
+  .about-hero {
+    background: linear-gradient(160deg, var(--latte), var(--cream));
+    padding: 32px 20px 24px;
+    text-align: center;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .about-emoji { font-size: 48px; margin-bottom: 12px; display: block; }
+  .about-heading { font-family: var(--font-display); font-size: 22px; font-weight: 300; color: var(--espresso); line-height: 1.4; margin-bottom: 10px; }
+  .about-body { font-size: 14px; color: var(--text-body); line-height: 1.9; font-weight: 300; }
+  .about-values { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+  .value-card { background: var(--white); border-radius: var(--radius-md); padding: 16px; text-align: center; box-shadow: 0 2px 10px var(--shadow); }
+  .value-icon { font-size: 24px; margin-bottom: 8px; }
+  .value-title { font-family: var(--font-serif); font-size: 13px; color: var(--espresso); font-weight: 500; margin-bottom: 4px; }
+  .value-desc { font-size: 11px; color: var(--text-muted); line-height: 1.6; }
+
+  /* ═══════════════════════════════
+     LINE NOTIFY TOAST
+  ═══════════════════════════════ */
+  .toast {
+    position: fixed;
+    top: 70px;
+    left: 50%; transform: translateX(-50%);
+    background: #06C755;
+    color: white;
+    padding: 10px 20px;
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 999;
+    box-shadow: 0 4px 16px rgba(6,199,85,0.4);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  /* ═══════════════════════════════
+     MODAL / OVERLAY
+  ═══════════════════════════════ */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(61,43,31,0.45);
+    z-index: 300;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .overlay.show { display: flex; }
+  .sheet {
+    background: var(--cream);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: 24px 20px 36px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .sheet-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
+  .sheet-title { font-family: var(--font-display); font-size: 20px; color: var(--espresso); margin-bottom: 16px; font-weight: 400; }
+  .sheet-form-group { margin-bottom: 14px; }
+  .sheet-label { font-size: 12px; color: var(--mocha); margin-bottom: 5px; display: block; font-weight: 500; letter-spacing: 0.05em; }
+  .sheet-input {
+    width: 100%; padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body); font-size: 14px;
+    background: var(--white); color: var(--text-body);
+    transition: border-color var(--transition);
+  }
+  .sheet-input:focus { outline: none; border-color: var(--caramel); }
+
+  /* ═══════════════════════════════
+     PAGE CONTENT AREAS
+  ═══════════════════════════════ */
+  .main-content {
+    padding-bottom: 72px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ── Scroll animations ── */
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(16px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  .product-card, .order-card, .report-card, .value-card {
+    animation: fadeUp 0.4s ease both;
+  }
+  .product-card:nth-child(2), .order-card:nth-child(2) { animation-delay: 0.06s; }
+  .product-card:nth-child(3), .order-card:nth-child(3) { animation-delay: 0.12s; }
+  .product-card:nth-child(4) { animation-delay: 0.18s; }
+
+  /* ── Mobile max-width wrapper ── */
+  .full-page { max-width: 480px; margin: 0 auto; }
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     LINE NOTIFY TOAST
+══════════════════════════════════ -->
+<div class="toast" id="lineToast">
+  <span>💚</span> LINE 通知已發送！
+</div>
+
+<!-- ══════════════════════════════════
+     STICKY HEADER
+══════════════════════════════════ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-group">
+      <div class="logo-name">Clama<span>·</span>nara</div>
+      <div class="logo-slogan">每一件，都為妳好好挑過。</div>
+    </div>
+    <div class="header-icons">
+      <button class="icon-btn" onclick="showPage('search')">🔍</button>
+      <button class="icon-btn" onclick="showLineLogin()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="#06C755"><path d="M12 2C6.477 2 2 6.15 2 11.256c0 4.078 2.714 7.566 6.6 9.097.288.105.246.284.184.56l-.267 1.266c-.04.19-.154.74.646.404C10.898 21.45 16.95 17.3 19.4 14.4 21.2 12.48 22 11.89 22 11.256 22 6.15 17.523 2 12 2z"/></svg>
+        <div class="badge">1</div>
+      </button>
+      <button class="icon-btn" onclick="showPage('cart')">🛍️<div class="badge">2</div></button>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════
+     PAGE: HOME
+══════════════════════════════════ -->
+<div id="page-home" class="page active">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-tag">✨ 本月新到貨</div>
+    <h1 class="hero-title">溫柔挑選<br>只為妳</h1>
+    <p class="hero-sub">Jellycat · Lululemon · 精選歐美代購</p>
+    <div class="hero-btns">
+      <button class="btn btn-primary" onclick="setCat('instock')">🛍 現貨商品</button>
+      <button class="btn btn-outline" onclick="setCat('preorder')">📦 預購專區</button>
+    </div>
+  </div>
+
+  <!-- Products -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">精選好物</h2>
+      <a class="section-more" href="#">查看全部 →</a>
+    </div>
+
+    <!-- Category tabs -->
+    <div class="cat-tabs" id="catTabs">
+      <div class="cat-tab active" onclick="setCat('all',this)">全部</div>
+      <div class="cat-tab" onclick="setCat('jellycat',this)">Jellycat</div>
+      <div class="cat-tab" onclick="setCat('lululemon',this)">Lululemon</div>
+      <div class="cat-tab" onclick="setCat('instock',this)">🟣 現貨</div>
+      <div class="cat-tab" onclick="setCat('preorder',this)">🟢 預購</div>
+      <div class="cat-tab" onclick="setCat('new',this)">新品</div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="product-grid" id="productGrid">
+      <!-- Cards injected by JS -->
+    </div>
+  </div>
+
+  <!-- About teaser -->
+  <div class="divider"></div>
+  <div class="section" style="text-align:center; padding: 28px 20px;">
+    <div style="font-size:28px; margin-bottom:10px;">🤍</div>
+    <p style="font-family:var(--font-serif); font-size:14px; color:var(--text-body); line-height:1.9; font-weight:300;">
+      我是一位新手媽媽，也是一個對美好事物充滿熱情的女生。<br>
+      創立 Clama·nara，只因想把那些<br>
+      <em style="color:var(--caramel); font-style:italic;">讓我心動的東西，也分享給妳。</em>
+    </p>
+    <button class="btn btn-outline" style="margin-top:16px;" onclick="showPage('about')">認識我們</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     PAGE: PRODUCT DETAIL
+══════════════════════════════════ -->
+<div id="page-detail" class="page">
+  <div class="detail-header">
+    <button class="back-btn" onclick="showPage('home')">←</button>
+    <span class="detail-page-title">商品詳情</span>
+  </div>
+  <div class="full-page">
+    <div class="detail-img" id="detailImg">🐻</div>
+    <div class="detail-body">
+      <div class="detail-brand" id="detailBrand">JELLYCAT</div>
+      <h2 class="detail-name" id="detailName">Bashful Bunny Medium</h2>
+      <div class="detail-price" id="detailPrice">NT$ 1,280</div>
+      <div class="detail-badge-row" id="detailBadgeRow"></div>
+      <p class="detail-desc" id="detailDesc">
+        全球最受歡迎的安撫玩偶之一。超柔軟的絨毛材質，圓潤的身型讓人一見鍾情，
+        無論是送給小朋友或大人都非常適合。限量色系，錯過不再！
+      </p>
+
+      <div class="option-label">選擇顏色</div>
+      <div class="option-row" id="colorOptions">
+        <div class="option-chip selected" onclick="selectChip(this)">奶油白</div>
+        <div class="option-chip" onclick="selectChip(this)">煙燻粉</div>
+        <div class="option-chip" onclick="selectChip(this)">薄荷綠</div>
+      </div>
+
+      <div class="option-label">出貨方式</div>
+      <select class="shipping-select">
+        <option value="">── 請選擇出貨方式 ──</option>
+        <option value="711">7-ELEVEN 超商取貨（免運）</option>
+        <option value="family">全家便利商店取貨（免運）</option>
+        <option value="post">郵寄到府（NT$60）</option>
+      </select>
+
+      <div class="option-label">數量</div>
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+        <button class="option-chip selected" id="qtyMinus" onclick="changeQty(-1)">－</button>
+        <span style="font-size:16px; font-weight:500; color:var(--espresso);" id="qtyDisplay">1</span>
+        <button class="option-chip" id="qtyPlus" onclick="changeQty(1)">＋</button>
+      </div>
+    </div>
+  </div>
+  <div class="detail-actions">
+    <button class="btn btn-outline" onclick="addToCart()">加入購物車</button>
+    <button class="btn btn-primary" onclick="buyNow()">立即購買</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     PAGE: ORDERS
+══════════════════════════════════ -->
+<div id="page-orders" class="page">
+  <div class="detail-header">
+    <button class="back-btn" onclick="showPage('home')">←</button>
+    <span class="detail-page-title">我的訂單</span>
+  </div>
+  <div class="full-page main-content" style="padding:16px 16px 80px;">
+    <div class="order-card">
+      <div class="order-card-header">
+        <div>
+          <div class="order-no">訂單 #CN2405-0087</div>
+          <div class="order-date">2025/05/20</div>
+        </div>
+        <span class="order-status status-shipping">📦 出貨中</span>
+      </div>
+      <div class="order-items">
+        <div class="order-item-row">
+          <span>Jellycat Bashful Bunny 奶油白</span>
+          <span>NT$1,280</span>
+        </div>
+        <div class="order-item-row">
+          <span>Lululemon Align Pant 25"</span>
+          <span>NT$3,480</span>
+        </div>
+      </div>
+      <div class="order-footer">
+        <span class="order-ship">🏪 7-ELEVEN 取貨</span>
+        <span class="order-total">合計 NT$4,760</span>
+      </div>
+    </div>
+
+    <div class="order-card">
+      <div class="order-card-header">
+        <div>
+          <div class="order-no">訂單 #CN2405-0071</div>
+          <div class="order-date">2025/05/12</div>
+        </div>
+        <span class="order-status status-pending">⏳ 備貨中</span>
+      </div>
+      <div class="order-items">
+        <div class="order-item-row">
+          <span>Jellycat Amuseable Avocado（預購）</span>
+          <span>NT$980</span>
+        </div>
+      </div>
+      <div class="order-footer">
+        <span class="order-ship">📮 郵寄到府</span>
+        <span class="order-total">合計 NT$1,040</span>
+      </div>
+    </div>
+
+    <div class="order-card">
+      <div class="order-card-header">
+        <div>
+          <div class="order-no">訂單 #CN2404-0055</div>
+          <div class="order-date">2025/04/28</div>
+        </div>
+        <span class="order-status status-done">✅ 已完成</span>
+      </div>
+      <div class="order-items">
+        <div class="order-item-row">
+          <span>Lululemon Belt Bag 1.5L 黑</span>
+          <span>NT$2,280</span>
+        </div>
+      </div>
+      <div class="order-footer">
+        <span class="order-ship">🏪 全家取貨</span>
+        <span class="order-total">合計 NT$2,280</span>
+      </div>
+    </div>
+
+    <!-- LINE bind prompt -->
+    <div style="background:linear-gradient(135deg,#E8F8EE,#D6F0DF); border-radius:var(--radius-md); padding:16px; margin-top:8px; display:flex; align-items:center; gap:12px;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="#06C755"><path d="M12 2C6.477 2 2 6.15 2 11.256c0 4.078 2.714 7.566 6.6 9.097.288.105.246.284.184.56l-.267 1.266c-.04.19-.154.74.646.404C10.898 21.45 16.95 17.3 19.4 14.4 21.2 12.48 22 11.89 22 11.256 22 6.15 17.523 2 12 2z"/></svg>
+      <div style="flex:1;">
+        <div style="font-size:13px; font-weight:500; color:#1A5C2A;">訂閱 LINE 訂單通知</div>
+        <div style="font-size:11px; color:#4A8C5C; margin-top:2px;">訂單出貨、到店即時通知</div>
+      </div>
+      <button class="btn btn-primary" style="font-size:11px; padding:8px 14px; background:#06C755; box-shadow:none;" onclick="showLineToast()">綁定</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     PAGE: REPORT (ADMIN)
+══════════════════════════════════ -->
+<div id="page-report" class="page">
+  <div class="detail-header">
+    <button class="back-btn" onclick="showPage('home')">←</button>
+    <span class="detail-page-title">當月業績報表 ── 2025/05</span>
+  </div>
+  <div class="full-page main-content" style="padding:16px 16px 80px;">
+
+    <div class="report-grid">
+      <div class="report-card">
+        <div class="report-label">本月業績</div>
+        <div class="report-value">68,420</div>
+        <div class="report-sub">↑ 12% vs 上月</div>
+      </div>
+      <div class="report-card">
+        <div class="report-label">訂單數</div>
+        <div class="report-value">42</div>
+        <div class="report-sub">↑ 8 筆</div>
+      </div>
+      <div class="report-card">
+        <div class="report-label">平均客單價</div>
+        <div class="report-value">1,629</div>
+        <div class="report-sub">NT$</div>
+      </div>
+      <div class="report-card">
+        <div class="report-label">預購收款</div>
+        <div class="report-value">18,600</div>
+        <div class="report-sub">共 12 筆</div>
+      </div>
+    </div>
+
+    <!-- Bar chart: weekly -->
+    <div class="bar-chart">
+      <div class="bar-title">📈 每週銷售</div>
+      <div class="bar-item">
+        <div class="bar-meta"><span>第 1 週</span><span>NT$14,200</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:54%"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-meta"><span>第 2 週</span><span>NT$18,900</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:72%"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-meta"><span>第 3 週</span><span>NT$22,100</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:84%"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-meta"><span>第 4 週（至今）</span><span>NT$13,220</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:50%"></div></div>
+      </div>
+    </div>
+
+    <!-- Top products -->
+    <div class="top-product-list">
+      <div class="bar-title">🏆 本月熱銷商品</div>
+      <div class="top-product-item">
+        <div class="rank-num">1</div>
+        <div class="top-product-info">
+          <div class="top-product-name">Lululemon Align Pant 25"</div>
+          <div class="top-product-brand">Lululemon</div>
+        </div>
+        <div class="top-product-rev">NT$24,360</div>
+      </div>
+      <div class="top-product-item">
+        <div class="rank-num">2</div>
+        <div class="top-product-info">
+          <div class="top-product-name">Bashful Bunny Medium</div>
+          <div class="top-product-brand">Jellycat</div>
+        </div>
+        <div class="top-product-rev">NT$15,360</div>
+      </div>
+      <div class="top-product-item">
+        <div class="rank-num">3</div>
+        <div class="top-product-info">
+          <div class="top-product-name">Amuseable Avocado（預購）</div>
+          <div class="top-product-brand">Jellycat</div>
+        </div>
+        <div class="top-product-rev">NT$9,800</div>
+      </div>
+    </div>
+
+    <!-- Shipping breakdown -->
+    <div class="bar-chart" style="margin-top:14px;">
+      <div class="bar-title">🚚 出貨方式分佈</div>
+      <div class="bar-item">
+        <div class="bar-meta"><span>7-ELEVEN</span><span>45%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:45%"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-meta"><span>全家</span><span>38%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:38%"></div></div>
+      </div>
+      <div class="bar-item">
+        <div class="bar-meta"><span>郵寄到府</span><span>17%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:17%"></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     PAGE: ABOUT
+══════════════════════════════════ -->
+<div id="page-about" class="page">
+  <div class="detail-header">
+    <button class="back-btn" onclick="showPage('home')">←</button>
+    <span class="detail-page-title">關於我們</span>
+  </div>
+  <div class="full-page main-content" style="padding-bottom:80px;">
+    <div class="about-hero">
+      <span class="about-emoji">🤍</span>
+      <h2 class="about-heading">從一位媽媽的心意<br>出發的選物店</h2>
+      <p class="about-body">
+        Clama·nara 的誕生，是因為我想給寶貝最溫柔的東西，<br>
+        也想讓跟我一樣愛美的妳，買到真正值得擁有的好物。<br><br>
+        每一件商品，都是我親自試用、嚴格把關後才上架。<br>
+        這不只是一間代購店，是我想陪著妳的方式。🫶
+      </p>
+    </div>
+    <div class="section">
+      <div class="about-values">
+        <div class="value-card">
+          <div class="value-icon">🔍</div>
+          <div class="value-title">嚴選把關</div>
+          <div class="value-desc">每件都親自試用，只挑真正喜歡的</div>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">💌</div>
+          <div class="value-title">溫暖服務</div>
+          <div class="value-desc">LINE 即時回覆，像朋友一樣</div>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">✈️</div>
+          <div class="value-title">安心代購</div>
+          <div class="value-desc">正品保證，全程追蹤</div>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🎀</div>
+          <div class="value-title">用心包裝</div>
+          <div class="value-desc">每個包裹都帶著愛</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     PAGE: CART (placeholder)
+══════════════════════════════════ -->
+<div id="page-cart" class="page">
+  <div class="detail-header">
+    <button class="back-btn" onclick="showPage('home')">←</button>
+    <span class="detail-page-title">購物車</span>
+  </div>
+  <div class="full-page main-content" style="padding:30px 20px; text-align:center;">
+    <div style="font-size:64px; margin-bottom:16px;">🛍️</div>
+    <p style="font-family:var(--font-serif); font-size:16px; color:var(--mocha); margin-bottom:8px;">購物車還空空的</p>
+    <p style="font-size:13px; color:var(--text-muted); margin-bottom:24px;">去逛逛，找到心動的東西吧！</p>
+    <button class="btn btn-primary" onclick="showPage('home')">繼續購物</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     BOTTOM NAV
+══════════════════════════════════ -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="nav-item active" onclick="showPage('home')" id="nav-home">
+    <span class="nav-icon">🏠</span>
+    <span class="nav-label">首頁</span>
+  </button>
+  <button class="nav-item" onclick="showPage('orders')" id="nav-orders">
+    <span class="nav-icon">📦</span>
+    <span class="nav-label">我的訂單</span>
+  </button>
+  <button class="nav-item" onclick="showPage('report')" id="nav-report">
+    <span class="nav-icon">📊</span>
+    <span class="nav-label">業績報表</span>
+  </button>
+  <button class="nav-item" onclick="showPage('about')" id="nav-about">
+    <span class="nav-icon">🤍</span>
+    <span class="nav-label">關於我們</span>
+  </button>
+</nav>
+
+<!-- ══════════════════════════════════
+     ORDER CONFIRM SHEET
+══════════════════════════════════ -->
+<div class="overlay" id="buyOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">確認訂購</div>
+    <div class="sheet-form-group">
+      <label class="sheet-label">姓名</label>
+      <input class="sheet-input" type="text" placeholder="請輸入收件人姓名">
+    </div>
+    <div class="sheet-form-group">
+      <label class="sheet-label">手機</label>
+      <input class="sheet-input" type="tel" placeholder="09XX-XXX-XXX">
+    </div>
+    <div class="sheet-form-group">
+      <label class="sheet-label">出貨方式</label>
+      <select class="sheet-input" style="appearance:none;">
+        <option>7-ELEVEN 超商取貨</option>
+        <option>全家便利商店取貨</option>
+        <option>郵寄到府（+NT$60）</option>
+      </select>
+    </div>
+    <div class="sheet-form-group">
+      <label class="sheet-label">備註</label>
+      <input class="sheet-input" type="text" placeholder="顏色、尺寸備注...">
+    </div>
+    <div style="display:flex; gap:10px; margin-top:6px;">
+      <button class="btn btn-outline" style="flex:1; justify-content:center;" onclick="closeOverlay()">取消</button>
+      <button class="btn btn-primary" style="flex:1; justify-content:center;" onclick="confirmOrder()">確認下單 💛</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     JS
+══════════════════════════════════ -->
+<script>
+// ── Product data ──
+const products = [
+  { id:1, brand:'JELLYCAT', name:'Bashful Bunny Medium', price:'NT$ 1,280', emoji:'🐰', type:'jellycat', status:'instock' },
+  { id:2, brand:'LULULEMON', name:'Align Pant 25" 瑜珈褲', price:'NT$ 3,480', emoji:'🏋️', type:'lululemon', status:'instock' },
+  { id:3, brand:'JELLYCAT', name:'Amuseable Avocado', price:'NT$ 980', emoji:'🥑', type:'jellycat', status:'preorder' },
+  { id:4, brand:'LULULEMON', name:'Belt Bag 1.5L 隨身包', price:'NT$ 2,280', emoji:'👜', type:'lululemon', status:'instock' },
+  { id:5, brand:'JELLYCAT', name:'Bartholomew Bear Medium', price:'NT$ 1,380', emoji:'🐻', type:'jellycat', status:'preorder' },
+  { id:6, brand:'LULULEMON', name:'Define Jacket 修身外套', price:'NT$ 4,680', emoji:'🧥', type:'lululemon', status:'instock' },
+];
+
+let currentCat = 'all';
+let qty = 1;
+
+function renderProducts(cat) {
+  const grid = document.getElementById('productGrid');
+  const filtered = cat === 'all' ? products : products.filter(p => p.type === cat || p.status === cat || (cat === 'new' && p.id <= 2));
+  grid.innerHTML = filtered.map(p => `
+    <div class="product-card" onclick="openDetail(${p.id})">
+      <div class="product-img" style="font-size:52px; background:linear-gradient(135deg,var(--latte),var(--cream));">
+        ${p.emoji}
+        <span class="stock-badge ${p.status}">${p.status==='instock'?'現貨':'預購'}</span>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">${p.brand}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-price-row">
+          <span class="product-price">${p.price}</span>
+          ${p.status==='instock'
+            ? `<button class="btn-instock" onclick="event.stopPropagation();addToCart()">🛍 加購</button>`
+            : `<button class="btn-preorder" onclick="event.stopPropagation();openDetail(${p.id})">📦 預購</button>`
+          }
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function setCat(cat, el) {
+  currentCat = cat;
+  // update tabs
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderProducts(cat);
+  // if on home page already, scroll to products
+  if (cat === 'instock' || cat === 'preorder') {
+    document.getElementById('page-home').scrollTo({ top: 200, behavior: 'smooth' });
+  }
+}
+
+function openDetail(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('detailImg').innerHTML = p.emoji;
+  document.getElementById('detailBrand').textContent = p.brand;
+  document.getElementById('detailName').textContent = p.name;
+  document.getElementById('detailPrice').textContent = p.price;
+  const badgeRow = document.getElementById('detailBadgeRow');
+  badgeRow.innerHTML = p.status === 'instock'
+    ? '<button class="btn-instock" style="pointer-events:none;">✅ 現貨</button>'
+    : '<button class="btn-preorder" style="pointer-events:none;">📦 預購</button>';
+  qty = 1;
+  document.getElementById('qtyDisplay').textContent = qty;
+  showPage('detail');
+}
+
+// ── Page navigation ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  // nav highlight
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + name);
+  if (navEl) navEl.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── Chip select ──
+function selectChip(el) {
+  el.closest('.option-row').querySelectorAll('.option-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ── Qty ──
+function changeQty(d) {
+  qty = Math.max(1, qty + d);
+  document.getElementById('qtyDisplay').textContent = qty;
+}
+
+// ── Cart / Buy ──
+function addToCart() {
+  showLineToast('🛍️ 已加入購物車！');
+}
+function buyNow() {
+  document.getElementById('buyOverlay').classList.add('show');
+}
+function closeOverlay() {
+  document.getElementById('buyOverlay').classList.remove('show');
+}
+function confirmOrder() {
+  closeOverlay();
+  showLineToast('✅ 訂單送出！LINE 通知已發送');
+  setTimeout(() => showPage('orders'), 1200);
+}
+
+// ── LINE toast ──
+function showLineToast(msg) {
+  const t = document.getElementById('lineToast');
+  t.innerHTML = '<span>💚</span> ' + (msg || 'LINE 訂單通知已發送！');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+function showLineLogin() {
+  showLineToast('💚 已連結 LINE 帳號！');
+}
+
+// ── Init ──
+renderProducts('all');
+</script>
+
+</body>
+</html>
