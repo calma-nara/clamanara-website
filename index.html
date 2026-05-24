@@ -690,9 +690,9 @@
     </div>
     <div class="header-icons">
       <button class="icon-btn" onclick="showPage('search')">🔍</button>
-      <button class="icon-btn" onclick="showLineLogin()">
+      <button class="icon-btn" onclick="openMemberOverlay()" id="memberBtn">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="#06C755"><path d="M12 2C6.477 2 2 6.15 2 11.256c0 4.078 2.714 7.566 6.6 9.097.288.105.246.284.184.56l-.267 1.266c-.04.19-.154.74.646.404C10.898 21.45 16.95 17.3 19.4 14.4 21.2 12.48 22 11.89 22 11.256 22 6.15 17.523 2 12 2z"/></svg>
-        <div class="badge">1</div>
+        <div class="badge" id="memberBadge" style="display:none;">✓</div>
       </button>
       <button class="icon-btn" onclick="showPage('cart')">🛍️<div class="badge">2</div></button>
     </div>
@@ -816,79 +816,30 @@
     <button class="back-btn" onclick="showPage('home')">←</button>
     <span class="detail-page-title">我的訂單</span>
   </div>
-  <div class="full-page main-content" style="padding:16px 16px 80px;">
-    <div class="order-card">
-      <div class="order-card-header">
-        <div>
-          <div class="order-no">訂單 #CN2405-0087</div>
-          <div class="order-date">2025/05/20</div>
-        </div>
-        <span class="order-status status-shipping">📦 出貨中</span>
-      </div>
-      <div class="order-items">
-        <div class="order-item-row">
-          <span>Jellycat Bashful Bunny 奶油白</span>
-          <span>NT$1,280</span>
-        </div>
-        <div class="order-item-row">
-          <span>Lululemon Align Pant 25"</span>
-          <span>NT$3,480</span>
-        </div>
-      </div>
-      <div class="order-footer">
-        <span class="order-ship">🏪 7-ELEVEN 取貨</span>
-        <span class="order-total">合計 NT$4,760</span>
-      </div>
+  <div class="full-page main-content" style="padding:16px 16px 80px;" id="ordersContent">
+
+    <!-- 未登入提示 -->
+    <div id="ordersLoginPrompt" style="text-align:center; padding:50px 20px;">
+      <div style="font-size:48px; margin-bottom:16px;">📦</div>
+      <p style="font-family:var(--font-serif); font-size:16px; color:var(--mocha); margin-bottom:8px;">查看你的訂單</p>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:24px;">登入會員後可查看所有歷史訂單</p>
+      <button class="btn btn-primary" onclick="openMemberOverlay()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.15 2 11.256c0 4.078 2.714 7.566 6.6 9.097.288.105.246.284.184.56l-.267 1.266c-.04.19-.154.74.646.404C10.898 21.45 16.95 17.3 19.4 14.4 21.2 12.48 22 11.89 22 11.256 22 6.15 17.523 2 12 2z"/></svg>
+        輸入手機號碼登入
+      </button>
     </div>
 
-    <div class="order-card">
-      <div class="order-card-header">
+    <!-- 已登入：訂單列表 -->
+    <div id="ordersList" style="display:none;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; background:var(--latte); border-radius:var(--radius-md); padding:12px 16px;">
+        <div style="font-size:24px;">🤍</div>
         <div>
-          <div class="order-no">訂單 #CN2405-0071</div>
-          <div class="order-date">2025/05/12</div>
+          <div style="font-size:14px; font-weight:500; color:var(--espresso);" id="ordersPageName">—</div>
+          <div style="font-size:11px; color:var(--text-muted);" id="ordersPageCount">—</div>
         </div>
-        <span class="order-status status-pending">⏳ 備貨中</span>
+        <button onclick="memberLogout()" style="margin-left:auto; font-size:11px; color:var(--text-muted); background:none; border:1px solid var(--border); border-radius:var(--radius-full); padding:4px 10px; cursor:pointer;">登出</button>
       </div>
-      <div class="order-items">
-        <div class="order-item-row">
-          <span>Jellycat Amuseable Avocado（預購）</span>
-          <span>NT$980</span>
-        </div>
-      </div>
-      <div class="order-footer">
-        <span class="order-ship">📮 郵寄到府</span>
-        <span class="order-total">合計 NT$1,040</span>
-      </div>
-    </div>
-
-    <div class="order-card">
-      <div class="order-card-header">
-        <div>
-          <div class="order-no">訂單 #CN2404-0055</div>
-          <div class="order-date">2025/04/28</div>
-        </div>
-        <span class="order-status status-done">✅ 已完成</span>
-      </div>
-      <div class="order-items">
-        <div class="order-item-row">
-          <span>Lululemon Belt Bag 1.5L 黑</span>
-          <span>NT$2,280</span>
-        </div>
-      </div>
-      <div class="order-footer">
-        <span class="order-ship">🏪 全家取貨</span>
-        <span class="order-total">合計 NT$2,280</span>
-      </div>
-    </div>
-
-    <!-- LINE bind prompt -->
-    <div style="background:linear-gradient(135deg,#E8F8EE,#D6F0DF); border-radius:var(--radius-md); padding:16px; margin-top:8px; display:flex; align-items:center; gap:12px;">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="#06C755"><path d="M12 2C6.477 2 2 6.15 2 11.256c0 4.078 2.714 7.566 6.6 9.097.288.105.246.284.184.56l-.267 1.266c-.04.19-.154.74.646.404C10.898 21.45 16.95 17.3 19.4 14.4 21.2 12.48 22 11.89 22 11.256 22 6.15 17.523 2 12 2z"/></svg>
-      <div style="flex:1;">
-        <div style="font-size:13px; font-weight:500; color:#1A5C2A;">訂閱 LINE 訂單通知</div>
-        <div style="font-size:11px; color:#4A8C5C; margin-top:2px;">訂單出貨、到店即時通知</div>
-      </div>
-      <button class="btn btn-primary" style="font-size:11px; padding:8px 14px; background:#06C755; box-shadow:none;" onclick="showLineToast()">綁定</button>
+      <div id="ordersRealList"></div>
     </div>
   </div>
 </div>
@@ -1142,6 +1093,57 @@
     <div style="display:flex; gap:10px;">
       <button class="btn btn-outline" style="flex:1; justify-content:center;" onclick="closeReportOverlay()">取消</button>
       <button class="btn btn-primary" style="flex:1; justify-content:center;" onclick="verifyReport()">確認進入 🔓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MEMBER LOGIN SHEET
+══════════════════════════════════ -->
+<div class="overlay" id="memberOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+
+    <!-- 未登入狀態 -->
+    <div id="memberLoginForm">
+      <div style="text-align:center; margin-bottom:20px;">
+        <div style="font-size:36px; margin-bottom:8px;">🤍</div>
+        <div style="font-family:var(--font-display); font-size:20px; color:var(--espresso);">會員登入</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">輸入手機號碼，自動帶入你的資料</div>
+      </div>
+      <div class="sheet-form-group">
+        <label class="sheet-label">手機號碼</label>
+        <input class="sheet-input" id="memberPhone" type="tel" placeholder="09XXXXXXXX" maxlength="10"
+          onkeydown="if(event.key==='Enter') memberLogin()">
+      </div>
+      <div id="memberLoginError" style="color:#b05c5c; font-size:12px; text-align:center; margin-bottom:10px; display:none;">
+        ❌ 找不到此手機號碼的會員資料
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-outline" style="flex:1; justify-content:center;" onclick="closeMemberOverlay()">取消</button>
+        <button class="btn btn-primary" style="flex:1; justify-content:center;" onclick="memberLogin()">登入 🤍</button>
+      </div>
+    </div>
+
+    <!-- 已登入狀態 -->
+    <div id="memberProfile" style="display:none;">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
+        <div style="width:52px; height:52px; border-radius:50%; background:var(--latte); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0;">🤍</div>
+        <div>
+          <div style="font-family:var(--font-serif); font-size:16px; font-weight:500; color:var(--espresso);" id="profileName">—</div>
+          <div style="font-size:12px; color:var(--text-muted);" id="profilePhone">—</div>
+          <div style="font-size:11px; color:var(--sage); margin-top:2px;" id="profileOrderCount">—</div>
+        </div>
+      </div>
+
+      <!-- 歷史訂單 -->
+      <div style="font-size:12px; font-weight:500; color:var(--mocha); margin-bottom:10px; letter-spacing:0.05em;">歷史訂單</div>
+      <div id="memberOrderList" style="max-height:280px; overflow-y:auto;"></div>
+
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button class="btn btn-outline" style="flex:1; justify-content:center;" onclick="memberLogout()">登出</button>
+        <button class="btn btn-primary" style="flex:1; justify-content:center;" onclick="closeMemberOverlay()">關閉</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1502,6 +1504,7 @@ function showPage(name) {
   if (navEl) navEl.classList.add('active');
   window.scrollTo(0, 0);
   if (name === 'cart') renderCart();
+  if (name === 'orders') renderOrdersPage();
 }
 
 // ════════════════════════════════════
@@ -1703,6 +1706,8 @@ function checkoutFromCart() {
   if (feeShip) feeShip.textContent = `+NT$${fee}`;
   if (feeTotal) feeTotal.textContent = `NT$${total.toLocaleString()}`;
 
+  // 自動帶入會員資料
+  autoFillOrderForm();
   // 顯示下單彈窗
   document.getElementById('buyOverlay').classList.add('show');
 }
@@ -1860,6 +1865,7 @@ function showLineLogin() {
 // 初始化
 // ════════════════════════════════════
 loadProducts();
+initMember();
 
 // ════════════════════════════════════
 // 運費自動計算
@@ -1953,6 +1959,192 @@ function updateOrderTotal() {
   if (feeProd) feeProd.textContent = `NT$${productPrice.toLocaleString()}`;
   if (feeShip) feeShip.textContent = fee > 0 ? `+NT$${fee}` : '請選擇出貨方式';
   if (feeTotal) feeTotal.textContent = `NT$${total.toLocaleString()}`;
+}
+
+// ════════════════════════════════════
+// 會員系統
+// ════════════════════════════════════
+let currentMember = null;
+
+// 從 localStorage 讀取登入狀態
+function initMember() {
+  const saved = localStorage.getItem('clama_member');
+  if (saved) {
+    try {
+      currentMember = JSON.parse(saved);
+      updateMemberUI();
+    } catch(e) {}
+  }
+}
+
+function openMemberOverlay() {
+  if (currentMember) {
+    showMemberProfile();
+  } else {
+    document.getElementById('memberLoginForm').style.display = 'block';
+    document.getElementById('memberProfile').style.display = 'none';
+    document.getElementById('memberLoginError').style.display = 'none';
+    document.getElementById('memberPhone').value = '';
+  }
+  document.getElementById('memberOverlay').classList.add('show');
+}
+
+function closeMemberOverlay() {
+  document.getElementById('memberOverlay').classList.remove('show');
+}
+
+async function memberLogin() {
+  const phone = document.getElementById('memberPhone').value.trim();
+  if (!phone) { showLineToast('⚠️ 請輸入手機號碼'); return; }
+
+  const btn = document.querySelector('#memberLoginForm .btn-primary');
+  btn.textContent = '查詢中…';
+  btn.disabled = true;
+
+  try {
+    // 從試算表查詢會員資料
+    const url = API_URL + '?action=getMember&phone=' + encodeURIComponent(phone);
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.success && data.member) {
+      currentMember = data.member;
+      localStorage.setItem('clama_member', JSON.stringify(currentMember));
+      updateMemberUI();
+      showMemberProfile();
+      autoFillOrderForm();
+    } else {
+      document.getElementById('memberLoginError').style.display = 'block';
+    }
+  } catch(e) {
+    // 若 API 失敗，嘗試從本地快取
+    showLineToast('⚠️ 查詢失敗，請稍後再試');
+  } finally {
+    btn.textContent = '登入 🤍';
+    btn.disabled = false;
+  }
+}
+
+function showMemberProfile() {
+  if (!currentMember) return;
+  document.getElementById('memberLoginForm').style.display = 'none';
+  document.getElementById('memberProfile').style.display = 'block';
+  renderOrdersPage();
+  document.getElementById('profileName').textContent = currentMember.name || '—';
+  document.getElementById('profilePhone').textContent = currentMember.phone || '—';
+  document.getElementById('profileOrderCount').textContent =
+    `共 ${(currentMember.orders || []).length} 筆訂單`;
+
+  // 顯示歷史訂單
+  const list = document.getElementById('memberOrderList');
+  const orders = currentMember.orders || [];
+  if (orders.length === 0) {
+    list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">還沒有訂單紀錄</div>';
+  } else {
+    list.innerHTML = orders.slice().reverse().map(o => `
+      <div style="background:var(--latte); border-radius:var(--radius-sm); padding:12px; margin-bottom:8px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span style="font-size:11px; color:var(--text-muted);">${o.orderId || '—'}</span>
+          <span style="font-size:10px; padding:2px 8px; border-radius:var(--radius-full); background:${o.status === '已完成' ? '#D6EDD6' : '#FFF0C8'}; color:${o.status === '已完成' ? '#2E6B2E' : '#7A5C00'};">${o.status || '待確認'}</span>
+        </div>
+        <div style="font-size:13px; color:var(--espresso); font-weight:500;">${o.product || '—'}</div>
+        <div style="display:flex; justify-content:space-between; margin-top:4px;">
+          <span style="font-size:11px; color:var(--text-muted);">${o.orderTime || '—'}</span>
+          <span style="font-size:13px; color:var(--caramel); font-weight:500;">${o.price || '—'}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function memberLogout() {
+  currentMember = null;
+  localStorage.removeItem('clama_member');
+  updateMemberUI();
+  closeMemberOverlay();
+  showLineToast('👋 已登出會員');
+}
+
+function renderOrdersPage() {
+  const loginPrompt = document.getElementById('ordersLoginPrompt');
+  const ordersList  = document.getElementById('ordersList');
+  const realList    = document.getElementById('ordersRealList');
+
+  if (!currentMember) {
+    if (loginPrompt) loginPrompt.style.display = 'block';
+    if (ordersList)  ordersList.style.display  = 'none';
+    return;
+  }
+
+  if (loginPrompt) loginPrompt.style.display = 'none';
+  if (ordersList)  ordersList.style.display  = 'block';
+
+  const nameEl  = document.getElementById('ordersPageName');
+  const countEl = document.getElementById('ordersPageCount');
+  if (nameEl)  nameEl.textContent  = currentMember.name || '—';
+  if (countEl) countEl.textContent = `共 ${(currentMember.orders||[]).length} 筆訂單`;
+
+  const orders = currentMember.orders || [];
+  if (!realList) return;
+
+  if (orders.length === 0) {
+    realList.innerHTML = `
+      <div style="text-align:center; padding:40px 20px;">
+        <div style="font-size:48px; margin-bottom:12px;">🛍️</div>
+        <p style="font-size:14px; color:var(--text-muted);">還沒有訂單紀錄</p>
+        <button class="btn btn-primary" style="margin-top:16px;" onclick="showPage('home')">去逛逛</button>
+      </div>`;
+    return;
+  }
+
+  realList.innerHTML = orders.slice().reverse().map(o => {
+    const statusClass = o.status === '已完成' ? 'status-done'
+      : o.status === '出貨中' ? 'status-shipping' : 'status-pending';
+    const statusIcon = o.status === '已完成' ? '✅'
+      : o.status === '出貨中' ? '📦' : '⏳';
+    return `
+      <div class="order-card">
+        <div class="order-card-header">
+          <div>
+            <div class="order-no">訂單 #${o.orderId || '—'}</div>
+            <div class="order-date">${o.orderTime || '—'}</div>
+          </div>
+          <span class="order-status ${statusClass}">${statusIcon} ${o.status || '待確認'}</span>
+        </div>
+        <div class="order-items">
+          <div class="order-item-row">
+            <span>${o.product || '—'} ${o.color ? '(' + o.color + ')' : ''}</span>
+            <span>${o.price || '—'}</span>
+          </div>
+        </div>
+        <div class="order-footer">
+          <span class="order-ship">🚚 ${o.shipping || '—'}</span>
+          <span class="order-total">合計 ${o.price || '—'}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function updateMemberUI() {
+  const badge = document.getElementById('memberBadge');
+  if (currentMember) {
+    badge.style.display = 'flex';
+    badge.textContent = '✓';
+    badge.style.background = '#06C755';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function autoFillOrderForm() {
+  if (!currentMember) return;
+  // 自動帶入下單表單
+  const nameEl = document.getElementById('orderName');
+  const lineEl = document.getElementById('orderLineName');
+  const phoneEl = document.getElementById('orderPhone');
+  if (nameEl && currentMember.name) nameEl.value = currentMember.name;
+  if (lineEl && currentMember.lineName) lineEl.value = currentMember.lineName;
+  if (phoneEl && currentMember.phone) phoneEl.value = currentMember.phone;
 }
 
 // ════════════════════════════════════
