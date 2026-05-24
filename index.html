@@ -823,10 +823,12 @@
       <div style="font-size:48px; margin-bottom:16px;">📦</div>
       <p style="font-family:var(--font-serif); font-size:16px; color:var(--mocha); margin-bottom:8px;">查看你的訂單</p>
       <p style="font-size:13px; color:var(--text-muted); margin-bottom:24px;">登入會員後可查看所有歷史訂單</p>
-      <button class="btn btn-primary" onclick="openMemberOverlay()">
+      <button onclick="lineLogin()" style="background:#06C755; color:white; border:none; border-radius:var(--radius-full); padding:14px 28px; font-size:14px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:8px; margin-bottom:10px; font-family:var(--font-body);">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.15 2 11.256c0 4.078 2.714 7.566 6.6 9.097.288.105.246.284.184.56l-.267 1.266c-.04.19-.154.74.646.404C10.898 21.45 16.95 17.3 19.4 14.4 21.2 12.48 22 11.89 22 11.256 22 6.15 17.523 2 12 2z"/></svg>
-        輸入手機號碼登入
+        使用 LINE 登入
       </button>
+      <br>
+      <button class="btn btn-outline" onclick="openMemberOverlay()" style="margin-top:8px;">手機號碼查詢</button>
     </div>
 
     <!-- 已登入：訂單列表 -->
@@ -1106,13 +1108,27 @@
 
     <!-- 未登入狀態 -->
     <div id="memberLoginForm">
-      <div style="text-align:center; margin-bottom:20px;">
+      <div style="text-align:center; margin-bottom:24px;">
         <div style="font-size:36px; margin-bottom:8px;">🤍</div>
         <div style="font-family:var(--font-display); font-size:20px; color:var(--espresso);">會員登入</div>
-        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">輸入手機號碼，自動帶入你的資料</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">登入後自動帶入資料，輕鬆購物</div>
       </div>
+
+      <!-- LINE Login 按鈕 -->
+      <button onclick="lineLogin()" style="width:100%; background:#06C755; color:white; border:none; border-radius:var(--radius-full); padding:14px; font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:16px; font-family:var(--font-body);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.15 2 11.256c0 4.078 2.714 7.566 6.6 9.097.288.105.246.284.184.56l-.267 1.266c-.04.19-.154.74.646.404C10.898 21.45 16.95 17.3 19.4 14.4 21.2 12.48 22 11.89 22 11.256 22 6.15 17.523 2 12 2z"/></svg>
+        使用 LINE 帳號登入
+      </button>
+
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+        <div style="flex:1; height:1px; background:var(--border);"></div>
+        <span style="font-size:11px; color:var(--text-muted);">或</span>
+        <div style="flex:1; height:1px; background:var(--border);"></div>
+      </div>
+
+      <!-- 手機號碼登入 -->
       <div class="sheet-form-group">
-        <label class="sheet-label">手機號碼</label>
+        <label class="sheet-label">手機號碼查詢訂單</label>
         <input class="sheet-input" id="memberPhone" type="tel" placeholder="09XXXXXXXX" maxlength="10"
           onkeydown="if(event.key==='Enter') memberLogin()">
       </div>
@@ -1121,7 +1137,7 @@
       </div>
       <div style="display:flex; gap:10px;">
         <button class="btn btn-outline" style="flex:1; justify-content:center;" onclick="closeMemberOverlay()">取消</button>
-        <button class="btn btn-primary" style="flex:1; justify-content:center;" onclick="memberLogin()">登入 🤍</button>
+        <button class="btn btn-primary" style="flex:1; justify-content:center;" onclick="memberLogin()">查詢 🔍</button>
       </div>
     </div>
 
@@ -1866,6 +1882,7 @@ function showLineLogin() {
 // ════════════════════════════════════
 loadProducts();
 initMember();
+handleLineCallback();
 
 // ════════════════════════════════════
 // 運費自動計算
@@ -1962,9 +1979,71 @@ function updateOrderTotal() {
 }
 
 // ════════════════════════════════════
+// LINE Login
+// ════════════════════════════════════
+const LINE_CHANNEL_ID = "2010174257";
+const LINE_REDIRECT_URI = "https://calma-nara.github.io/clamanara-website/";
+
+function lineLogin() {
+  const state = Math.random().toString(36).slice(2);
+  localStorage.setItem("line_state", state);
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: LINE_CHANNEL_ID,
+    redirect_uri: LINE_REDIRECT_URI,
+    state: state,
+    scope: "profile openid",
+    bot_prompt: "aggressive"
+  });
+  window.location.href = "https://access.line.me/oauth2/v2.1/authorize?" + params.toString();
+}
+
+async function handleLineCallback() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const code  = urlParams.get("code");
+  const state = urlParams.get("state");
+  const savedState = localStorage.getItem("line_state");
+
+  if (!code || state !== savedState) return;
+
+  // 清除 URL 參數
+  window.history.replaceState({}, document.title, window.location.pathname);
+  localStorage.removeItem("line_state");
+
+  showLineToast("💚 LINE 登入中，請稍候⋯");
+
+  try {
+    // 透過 Apps Script 換取 LINE Profile
+    const res = await fetch(API_URL + "?action=lineCallback&code=" + encodeURIComponent(code) + "&redirect_uri=" + encodeURIComponent(LINE_REDIRECT_URI));
+    const data = await res.json();
+
+    if (data.success && data.profile) {
+      // 用 LINE displayName 建立會員
+      currentMember = {
+        name: data.profile.displayName,
+        lineName: data.profile.displayName,
+        lineId: data.profile.userId,
+        phone: "",
+        orders: data.orders || []
+      };
+      localStorage.setItem("clama_member", JSON.stringify(currentMember));
+      updateMemberUI();
+      renderOrdersPage();
+      autoFillOrderForm();
+      showLineToast("💚 歡迎回來，" + data.profile.displayName + "！");
+    } else {
+      showLineToast("⚠️ LINE 登入失敗，請再試一次");
+    }
+  } catch(e) {
+    showLineToast("⚠️ 登入失敗：" + e.message);
+  }
+}
+
+// ════════════════════════════════════
 // 會員系統
 // ════════════════════════════════════
 let currentMember = null;
+
 
 // 從 localStorage 讀取登入狀態
 function initMember() {
