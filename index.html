@@ -1130,7 +1130,10 @@
     <!-- 已登入狀態 -->
     <div id="memberProfile" style="display:none;">
       <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-        <div style="width:52px; height:52px; border-radius:50%; background:var(--latte); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0;">🤍</div>
+        <div style="width:52px; height:52px; border-radius:50%; background:var(--latte); overflow:hidden; flex-shrink:0;" id="memberAvatar">
+        <img id="memberAvatarImg" src="" style="width:100%; height:100%; object-fit:cover; display:none;" onerror="this.style.display='none'">
+        <div id="memberAvatarEmoji" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:24px;">🤍</div>
+      </div>
         <div>
           <div style="font-family:var(--font-serif); font-size:16px; font-weight:500; color:var(--espresso);" id="profileName">—</div>
           <div style="font-size:12px; color:var(--text-muted);" id="profilePhone">—</div>
@@ -1811,6 +1814,7 @@ async function confirmOrder() {
     price:        `NT$${totalPrice.toLocaleString()}`,
     status:       '待確認',
     notified:     '否',
+    lineUserId:   currentMember ? (currentMember.lineId || '') : '',
   };
 
   try {
@@ -2004,11 +2008,11 @@ async function handleLineCallback() {
     const data = await res.json();
 
     if (data.success && data.profile) {
-      // 用 LINE displayName 建立會員
       currentMember = {
         name: data.profile.displayName,
         lineName: data.profile.displayName,
         lineId: data.profile.userId,
+        pictureUrl: data.profile.pictureUrl || '',
         phone: "",
         orders: data.orders || []
       };
@@ -2048,8 +2052,6 @@ function openMemberOverlay() {
   } else {
     document.getElementById('memberLoginForm').style.display = 'block';
     document.getElementById('memberProfile').style.display = 'none';
-    document.getElementById('memberLoginError').style.display = 'none';
-    document.getElementById('memberPhone').value = '';
   }
   document.getElementById('memberOverlay').classList.add('show');
 }
@@ -2058,36 +2060,9 @@ function closeMemberOverlay() {
   document.getElementById('memberOverlay').classList.remove('show');
 }
 
-async function memberLogin() {
-  const phone = document.getElementById('memberPhone').value.trim();
-  if (!phone) { showLineToast('⚠️ 請輸入手機號碼'); return; }
-
-  const btn = document.querySelector('#memberLoginForm .btn-primary');
-  btn.textContent = '查詢中…';
-  btn.disabled = true;
-
-  try {
-    // 從試算表查詢會員資料
-    const url = API_URL + '?action=getMember&phone=' + encodeURIComponent(phone);
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if (data.success && data.member) {
-      currentMember = data.member;
-      localStorage.setItem('clama_member', JSON.stringify(currentMember));
-      updateMemberUI();
-      showMemberProfile();
-      autoFillOrderForm();
-    } else {
-      document.getElementById('memberLoginError').style.display = 'block';
-    }
-  } catch(e) {
-    // 若 API 失敗，嘗試從本地快取
-    showLineToast('⚠️ 查詢失敗，請稍後再試');
-  } finally {
-    btn.textContent = '登入 🤍';
-    btn.disabled = false;
-  }
+// 手機登入已移除，僅使用 LINE 登入
+function memberLogin() {
+  lineLogin();
 }
 
 function showMemberProfile() {
@@ -2096,9 +2071,16 @@ function showMemberProfile() {
   document.getElementById('memberProfile').style.display = 'block';
   renderOrdersPage();
   document.getElementById('profileName').textContent = currentMember.name || '—';
-  document.getElementById('profilePhone').textContent = currentMember.phone || '—';
+  document.getElementById('profilePhone').textContent = currentMember.phone || currentMember.lineId || '—';
   document.getElementById('profileOrderCount').textContent =
     `共 ${(currentMember.orders || []).length} 筆訂單`;
+  // 顯示 LINE 頭像
+  if (currentMember.pictureUrl) {
+    const img = document.getElementById('memberAvatarImg');
+    const emoji = document.getElementById('memberAvatarEmoji');
+    if (img) { img.src = currentMember.pictureUrl; img.style.display = 'block'; }
+    if (emoji) emoji.style.display = 'none';
+  }
 
   // 顯示歷史訂單
   const list = document.getElementById('memberOrderList');
@@ -2146,7 +2128,7 @@ function renderOrdersPage() {
 
   const nameEl  = document.getElementById('ordersPageName');
   const countEl = document.getElementById('ordersPageCount');
-  if (nameEl)  nameEl.textContent  = currentMember.name || '—';
+  if (nameEl)  nameEl.textContent  = (currentMember.name || '—') + ' 👋';
   if (countEl) countEl.textContent = `共 ${(currentMember.orders||[]).length} 筆訂單`;
 
   const orders = currentMember.orders || [];
