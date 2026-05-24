@@ -823,12 +823,10 @@
       <div style="font-size:48px; margin-bottom:16px;">📦</div>
       <p style="font-family:var(--font-serif); font-size:16px; color:var(--mocha); margin-bottom:8px;">查看你的訂單</p>
       <p style="font-size:13px; color:var(--text-muted); margin-bottom:24px;">登入會員後可查看所有歷史訂單</p>
-      <button onclick="lineLogin()" style="background:#06C755; color:white; border:none; border-radius:var(--radius-full); padding:14px 28px; font-size:14px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:8px; margin-bottom:10px; font-family:var(--font-body);">
+      <button onclick="lineLogin()" style="background:#06C755; color:white; border:none; border-radius:var(--radius-full); padding:14px 28px; font-size:14px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-family:var(--font-body); box-shadow:0 4px 16px rgba(6,199,85,0.35);">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.15 2 11.256c0 4.078 2.714 7.566 6.6 9.097.288.105.246.284.184.56l-.267 1.266c-.04.19-.154.74.646.404C10.898 21.45 16.95 17.3 19.4 14.4 21.2 12.48 22 11.89 22 11.256 22 6.15 17.523 2 12 2z"/></svg>
-        使用 LINE 登入
+        使用 LINE 帳號登入
       </button>
-      <br>
-      <button class="btn btn-outline" onclick="openMemberOverlay()" style="margin-top:8px;">手機號碼查詢</button>
     </div>
 
     <!-- 已登入：訂單列表 -->
@@ -1108,37 +1106,25 @@
 
     <!-- 未登入狀態 -->
     <div id="memberLoginForm">
-      <div style="text-align:center; margin-bottom:24px;">
-        <div style="font-size:36px; margin-bottom:8px;">🤍</div>
-        <div style="font-family:var(--font-display); font-size:20px; color:var(--espresso);">會員登入</div>
-        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">登入後自動帶入資料，輕鬆購物</div>
+      <div style="text-align:center; margin-bottom:28px;">
+        <div style="font-size:40px; margin-bottom:10px;">🤍</div>
+        <div style="font-family:var(--font-display); font-size:22px; color:var(--espresso);">會員登入</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:6px; line-height:1.6;">
+          登入後自動帶入資料<br>輕鬆購物、查看訂單紀錄
+        </div>
       </div>
 
       <!-- LINE Login 按鈕 -->
-      <button onclick="lineLogin()" style="width:100%; background:#06C755; color:white; border:none; border-radius:var(--radius-full); padding:14px; font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:16px; font-family:var(--font-body);">
+      <button onclick="lineLogin()" style="width:100%; background:#06C755; color:white; border:none; border-radius:var(--radius-full); padding:15px; font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:14px; font-family:var(--font-body); box-shadow:0 4px 16px rgba(6,199,85,0.35);">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.477 2 2 6.15 2 11.256c0 4.078 2.714 7.566 6.6 9.097.288.105.246.284.184.56l-.267 1.266c-.04.19-.154.74.646.404C10.898 21.45 16.95 17.3 19.4 14.4 21.2 12.48 22 11.89 22 11.256 22 6.15 17.523 2 12 2z"/></svg>
         使用 LINE 帳號登入
       </button>
 
-      <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
-        <div style="flex:1; height:1px; background:var(--border);"></div>
-        <span style="font-size:11px; color:var(--text-muted);">或</span>
-        <div style="flex:1; height:1px; background:var(--border);"></div>
+      <div style="font-size:11px; color:var(--text-muted); text-align:center; margin-bottom:16px; line-height:1.6;">
+        點擊後將跳轉至 LINE 授權頁面<br>授權後自動返回網站
       </div>
 
-      <!-- 手機號碼登入 -->
-      <div class="sheet-form-group">
-        <label class="sheet-label">手機號碼查詢訂單</label>
-        <input class="sheet-input" id="memberPhone" type="tel" placeholder="09XXXXXXXX" maxlength="10"
-          onkeydown="if(event.key==='Enter') memberLogin()">
-      </div>
-      <div id="memberLoginError" style="color:#b05c5c; font-size:12px; text-align:center; margin-bottom:10px; display:none;">
-        ❌ 找不到此手機號碼的會員資料
-      </div>
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-outline" style="flex:1; justify-content:center;" onclick="closeMemberOverlay()">取消</button>
-        <button class="btn btn-primary" style="flex:1; justify-content:center;" onclick="memberLogin()">查詢 🔍</button>
-      </div>
+      <button class="btn btn-outline" style="width:100%; justify-content:center;" onclick="closeMemberOverlay()">取消</button>
     </div>
 
     <!-- 已登入狀態 -->
@@ -1260,6 +1246,8 @@
 // ⚙️ 設定區（只需要改這裡）
 // ════════════════════════════════════
 const API_URL = 'https://script.google.com/macros/s/AKfycby-eHUJCagG5oKrGQU2fwUfprbboRz99mt64cEMPzaFLCJgzmiD8jGiiK9DXqigyRA/exec';
+const LINE_CHANNEL_ID = '2010174257';
+const LINE_REDIRECT_URI = 'https://calma-nara.github.io/clamanara-website/';
 
 // ── 商品資料（從 Google 試算表動態讀取）──
 let products = [];
@@ -1981,8 +1969,6 @@ function updateOrderTotal() {
 // ════════════════════════════════════
 // LINE Login
 // ════════════════════════════════════
-const LINE_CHANNEL_ID = "2010174257";
-const LINE_REDIRECT_URI = "https://calma-nara.github.io/clamanara-website/";
 
 function lineLogin() {
   const state = Math.random().toString(36).slice(2);
