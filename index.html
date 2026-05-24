@@ -1246,15 +1246,132 @@
 // ════════════════════════════════════
 const API_URL = 'https://script.google.com/macros/s/AKfycby-eHUJCagG5oKrGQU2fwUfprbboRz99mt64cEMPzaFLCJgzmiD8jGiiK9DXqigyRA/exec';
 
-// ── 商品資料（之後可以直接在這裡新增/修改商品）──
-const products = [
-  { id:1, brand:'JELLYCAT', name:'Bashful Bunny Medium', price:'NT$ 1,280', priceNum:1280, emoji:'🐰', type:'jellycat', status:'instock', stock:5, colors:['奶油白','煙燻粉','薄荷綠'] },
-  { id:2, brand:'LULULEMON', name:'Align Pant 25" 瑜珈褲', price:'NT$ 3,480', priceNum:3480, emoji:'🏋️', type:'lululemon', status:'instock', stock:3, colors:['黑色','深藍','莓果紫'] },
-  { id:3, brand:'JELLYCAT', name:'Amuseable Avocado', price:'NT$ 980', priceNum:980, emoji:'🥑', type:'jellycat', status:'preorder', stock:0, colors:['經典綠'] },
-  { id:4, brand:'LULULEMON', name:'Belt Bag 1.5L 隨身包', price:'NT$ 2,280', priceNum:2280, emoji:'👜', type:'lululemon', status:'instock', stock:8, colors:['黑色','白色','卡其'] },
-  { id:5, brand:'JELLYCAT', name:'Bartholomew Bear Medium', price:'NT$ 1,380', priceNum:1380, emoji:'🐻', type:'jellycat', status:'preorder', stock:0, colors:['焦糖棕','灰色'] },
-  { id:6, brand:'LULULEMON', name:'Define Jacket 修身外套', price:'NT$ 4,680', priceNum:4680, emoji:'🧥', type:'lululemon', status:'instock', stock:2, colors:['黑色','粉霧','深綠'] },
-];
+// ── 商品資料（從 Google 試算表動態讀取）──
+let products = [];
+
+// 從試算表載入商品
+async function loadProducts() {
+  const grid = document.getElementById('productGrid');
+  if (grid) grid.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-muted); font-size:13px;">🛍️ 載入商品中⋯</div>';
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTx4t8V3kNP1-DCrdj-xZL45UKimPXmTUy04LFpGNY9R8oBGuCf5UUPK98-AjB1hj2oc7UxP2NRNdgw/pub?gid=0&single=true&output=csv";
+  try {
+    const res = await fetch(CSV_URL);
+    if (!res.ok) throw new Error("fetch failed");
+    const text = await res.text();
+    parseCSVAndRender(text);
+  } catch(e) {
+    console.log("CSV 載入失敗，使用預設商品:", e.message);
+    loadDefaultProducts();
+  }
+}
+
+function parseCSVAndRender(csvText) {
+  const lines = csvText.trim().split("\n");
+  if (lines.length < 2) { loadDefaultProducts(); return; }
+  const grouped = {};
+  for (let i = 1; i < lines.length; i++) {
+    const cols = parseCSVLine(lines[i]);
+    if (!cols || cols.length < 5) continue;
+    const id     = cols[0].trim();
+    const name   = cols[1].trim();
+    const color  = cols[2].trim();
+    const stock  = parseInt(cols[3]) || 0;
+    const status = (cols[4].trim() === "現貨") ? "instock" : "preorder";
+    const price  = parseInt(cols[5]) || 0;
+    const image   = cols[6] ? cols[6].trim() : "";
+    const publish = cols[7] ? cols[7].trim() : "上架";
+    if (!name) continue;
+    if (publish === "下架") continue; // 下架商品不顯示
+    const key = id + "_" + name;
+    if (!grouped[key]) {
+      grouped[key] = {
+        id: parseInt(id) || i,
+        brand: detectBrand(name),
+        name, price: "NT$ " + price.toLocaleString(),
+        priceNum: price, emoji: detectEmoji(name),
+        type: detectType(name), status, stock,
+        colors: [], image
+      };
+    }
+    if (color && !grouped[key].colors.includes(color)) grouped[key].colors.push(color);
+    if (status === "instock") grouped[key].status = "instock";
+    if (stock > grouped[key].stock) grouped[key].stock = stock;
+  }
+  products = Object.values(grouped);
+  if (products.length > 0) { renderProducts("all"); }
+  else { loadDefaultProducts(); }
+}
+
+function parseCSVLine(line) {
+  const result = []; let current = ""; let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') { inQuotes = !inQuotes; }
+    else if (char === "," && !inQuotes) { result.push(current); current = ""; }
+    else { current += char; }
+  }
+  result.push(current);
+  return result;
+}
+
+function processProducts(rawProducts) {
+  const grouped = {};
+  rawProducts.forEach(p => {
+    const key = String(p.id) + "_" + p.name;
+    if (!grouped[key]) {
+      grouped[key] = {
+        id: p.id, brand: detectBrand(p.name), name: p.name,
+        price: "NT$ " + Number(p.price).toLocaleString(),
+        priceNum: Number(p.price), emoji: detectEmoji(p.name),
+        type: detectType(p.name),
+        status: p.status === "現貨" ? "instock" : "preorder",
+        stock: Number(p.stock), colors: [], image: p.image || ""
+      };
+    }
+    if (p.color) grouped[key].colors.push(p.color);
+  });
+  products = Object.values(grouped);
+  if (products.length > 0) { renderProducts("all"); }
+  else { loadDefaultProducts(); }
+}
+
+
+function detectBrand(name) {
+  const n = name.toLowerCase();
+  if (n.includes('jellycat') || n.includes('bunny') || n.includes('bear') || n.includes('avocado')) return 'JELLYCAT';
+  if (n.includes('lululemon') || n.includes('align') || n.includes('belt bag') || n.includes('define')) return 'LULULEMON';
+  return 'CALMA·NARA';
+}
+
+function detectEmoji(name) {
+  const n = name.toLowerCase();
+  if (n.includes('bunny') || n.includes('rabbit')) return '🐰';
+  if (n.includes('bear')) return '🐻';
+  if (n.includes('avocado')) return '🥑';
+  if (n.includes('bag') || n.includes('包')) return '👜';
+  if (n.includes('jacket') || n.includes('外套')) return '🧥';
+  if (n.includes('pant') || n.includes('褲')) return '👖';
+  if (n.includes('藍')) return '💙';
+  if (n.includes('粉')) return '🌸';
+  if (n.includes('限定')) return '⭐';
+  return '🛍️';
+}
+
+function detectType(name) {
+  const n = name.toLowerCase();
+  if (n.includes('jellycat') || n.includes('bunny') || n.includes('bear') || n.includes('avocado')) return 'jellycat';
+  if (n.includes('lululemon') || n.includes('align') || n.includes('belt') || n.includes('define')) return 'lululemon';
+  return 'other';
+}
+
+function loadDefaultProducts() {
+  products = [
+    { id:1, brand:'JELLYCAT', name:'Bashful Bunny Medium', price:'NT$ 1,280', priceNum:1280, emoji:'🐰', type:'jellycat', status:'instock', stock:5, colors:['奶油白','煙燻粉','薄荷綠'] },
+    { id:2, brand:'LULULEMON', name:'Align Pant 25" 瑜珈褲', price:'NT$ 3,480', priceNum:3480, emoji:'🏋️', type:'lululemon', status:'instock', stock:3, colors:['黑色','深藍','莓果紫'] },
+    { id:3, brand:'JELLYCAT', name:'Amuseable Avocado', price:'NT$ 980', priceNum:980, emoji:'🥑', type:'jellycat', status:'preorder', stock:0, colors:['經典綠'] },
+  ];
+  renderProducts('all');
+}
 
 // ── 狀態變數 ──
 let currentCat = 'all';
@@ -1272,7 +1389,7 @@ function renderProducts(cat) {
   grid.innerHTML = filtered.map(p => `
     <div class="product-card" onclick="openDetail(${p.id})">
       <div class="product-img" style="font-size:52px; background:linear-gradient(135deg,var(--latte),var(--cream));">
-        ${p.emoji}
+        ${p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;border-radius:0;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:52px;">${p.emoji}</div>` : `<span style="font-size:52px;">${p.emoji}</span>`}
         <span class="stock-badge ${p.status}">${p.status==='instock'?'現貨':'預購'}</span>
       </div>
       <div class="product-info">
@@ -1282,7 +1399,7 @@ function renderProducts(cat) {
           <span class="product-price">${p.price}</span>
           ${p.status==='instock'
             ? `<button class="btn-instock" onclick="event.stopPropagation();quickAdd(${p.id})">🛍 加購</button>`
-            : `<button class="btn-preorder" onclick="event.stopPropagation();openDetail(${p.id})">📦 預購</button>`
+            : `<button class="btn-preorder" onclick="event.stopPropagation();quickAdd(${p.id})">📦 預購</button>`
           }
         </div>
         ${p.status==='instock' && p.stock <= 3 && p.stock > 0
@@ -1316,7 +1433,7 @@ function openDetail(id) {
   document.getElementById('detailPrice').textContent = p.price;
   document.getElementById('detailBadgeRow').innerHTML = p.status === 'instock'
     ? '<button class="btn-instock" style="pointer-events:none;">✅ 現貨</button>'
-    : '<button class="btn-preorder" style="pointer-events:none;">📦 預購</button>';
+    : '<button class="btn-preorder" style="pointer-events:none;">📦 預購中</button>';
   const stockEl = document.getElementById('detailStock');
   if (p.status === 'instock') {
     if (p.stock === 0) {
@@ -1662,24 +1779,28 @@ async function confirmOrder() {
   };
 
   try {
-    // Google Apps Script 需要 no-cors 模式
-    await fetch(API_URL, {
+    // 方法1: GET 參數方式（最相容 Google Apps Script）
+    const getUrl = API_URL + '?payload=' + encodeURIComponent(JSON.stringify(orderData));
+    fetch(getUrl, { method: 'GET', mode: 'no-cors' }).catch(() => {});
+
+    // 方法2: POST no-cors 雙保險
+    fetch(API_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify(orderData),
-    });
+    }).catch(() => {});
 
-    // no-cors 模式下無法讀取回應，直接視為成功
+    // 等1秒讓請求送出
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     closeOverlay();
     showLineToast(`✅ 訂單 ${orderData.orderId} 已成立！通知已發送 💚`);
-    // 清空表單
     ['orderName','orderLineName','orderPhone','orderNote','orderRemittance','orderStoreNo','orderAddress'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
     document.getElementById('orderShipping').value = '';
-    // 清空購物車
     cart = [];
     updateCartBadge();
     setTimeout(() => showPage('orders'), 1800);
@@ -1712,7 +1833,7 @@ function showLineLogin() {
 // ════════════════════════════════════
 // 初始化
 // ════════════════════════════════════
-renderProducts('all');
+loadProducts();
 
 // ════════════════════════════════════
 // 運費自動計算
