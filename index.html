@@ -721,14 +721,11 @@
       <a class="section-more" href="#">查看全部 →</a>
     </div>
 
-    <!-- Category tabs -->
+    <!-- Category tabs（動態從試算表讀取）-->
     <div class="cat-tabs" id="catTabs">
       <div class="cat-tab active" onclick="setCat('all',this)">全部</div>
-      <div class="cat-tab" onclick="setCat('jellycat',this)">Jellycat</div>
-      <div class="cat-tab" onclick="setCat('lululemon',this)">Lululemon</div>
       <div class="cat-tab" onclick="setCat('instock',this)">🟣 現貨</div>
       <div class="cat-tab" onclick="setCat('preorder',this)">🟢 預購</div>
-      <div class="cat-tab" onclick="setCat('new',this)">新品</div>
     </div>
 
     <!-- Product Grid -->
@@ -1272,16 +1269,18 @@ function parseCSVAndRender(csvText) {
   for (let i = 1; i < lines.length; i++) {
     const cols = parseCSVLine(lines[i]);
     if (!cols || cols.length < 5) continue;
-    const id     = cols[0].trim();
-    const name   = cols[1].trim();
-    const color  = cols[2].trim();
-    const stock  = parseInt(cols[3]) || 0;
-    const status = (cols[4].trim() === "現貨") ? "instock" : "preorder";
-    const price  = parseInt(cols[5]) || 0;
-    const image   = cols[6] ? cols[6].trim() : "";
-    const publish = cols[7] ? cols[7].trim() : "上架";
-    if (!name) continue;
-    if (publish === "下架") continue; // 下架商品不顯示
+    const id       = (cols[0] || "").trim();
+    const name     = (cols[1] || "").trim();
+    const color    = (cols[2] || "").trim();
+    const stock    = parseInt(cols[3]) || 0;
+    const statusRaw = (cols[4] || "").trim();
+    const status   = (statusRaw === "現貨") ? "instock" : "preorder";
+    const price    = parseInt((cols[5] || "0").replace(/[^\d]/g, "")) || 0;
+    const image    = (cols[6] || "").trim();
+    const publish  = (cols[7] || "上架").trim();
+    const category = (cols[8] || "其他").trim();
+    if (!name || !id) continue;
+    if (publish === "下架") continue;
     const key = id + "_" + name;
     if (!grouped[key]) {
       grouped[key] = {
@@ -1289,17 +1288,37 @@ function parseCSVAndRender(csvText) {
         brand: detectBrand(name),
         name, price: "NT$ " + price.toLocaleString(),
         priceNum: price, emoji: detectEmoji(name),
-        type: detectType(name), status, stock,
+        type: detectType(name), category, status, stock,
         colors: [], image
       };
     }
-    if (color && !grouped[key].colors.includes(color)) grouped[key].colors.push(color);
+    // 顏色欄位為空時使用預設
+    const colorToAdd = color || "預設";
+    if (!grouped[key].colors.includes(colorToAdd)) grouped[key].colors.push(colorToAdd);
     if (status === "instock") grouped[key].status = "instock";
     if (stock > grouped[key].stock) grouped[key].stock = stock;
   }
   products = Object.values(grouped);
-  if (products.length > 0) { renderProducts("all"); }
-  else { loadDefaultProducts(); }
+  if (products.length > 0) {
+    renderCategoryTabs();
+    renderProducts("all");
+  } else { loadDefaultProducts(); }
+}
+
+function renderCategoryTabs() {
+  const tabsEl = document.getElementById('catTabs');
+  if (!tabsEl) return;
+
+  // 從商品資料抓出所有唯一分類
+  const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
+
+  // 保留「全部、現貨、預購」三個固定標籤，動態加入分類
+  tabsEl.innerHTML = `
+    <div class="cat-tab active" onclick="setCat('all',this)">全部</div>
+    ${categories.map(cat => `<div class="cat-tab" onclick="setCat('${cat}',this)">${cat}</div>`).join('')}
+    <div class="cat-tab" onclick="setCat('instock',this)">🟣 現貨</div>
+    <div class="cat-tab" onclick="setCat('preorder',this)">🟢 預購</div>
+  `;
 }
 
 function parseCSVLine(line) {
@@ -1331,8 +1350,10 @@ function processProducts(rawProducts) {
     if (p.color) grouped[key].colors.push(p.color);
   });
   products = Object.values(grouped);
-  if (products.length > 0) { renderProducts("all"); }
-  else { loadDefaultProducts(); }
+  if (products.length > 0) {
+    renderCategoryTabs();
+    renderProducts("all");
+  } else { loadDefaultProducts(); }
 }
 
 
@@ -1385,7 +1406,12 @@ let cart = [];
 function renderProducts(cat) {
   const grid = document.getElementById('productGrid');
   const filtered = cat === 'all' ? products
-    : products.filter(p => p.type === cat || p.status === cat || (cat === 'new' && p.id <= 2));
+    : products.filter(p =>
+        p.category === cat ||
+        p.type === cat ||
+        p.status === cat ||
+        (cat === 'new' && p.id <= 2)
+      );
   grid.innerHTML = filtered.map(p => `
     <div class="product-card" onclick="openDetail(${p.id})">
       <div class="product-img" style="font-size:52px; background:linear-gradient(135deg,var(--latte),var(--cream));">
