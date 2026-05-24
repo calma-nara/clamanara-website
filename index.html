@@ -694,7 +694,7 @@
         <svg width="22" height="22" viewBox="0 0 24 24" fill="#06C755"><path d="M12 2C6.477 2 2 6.15 2 11.256c0 4.078 2.714 7.566 6.6 9.097.288.105.246.284.184.56l-.267 1.266c-.04.19-.154.74.646.404C10.898 21.45 16.95 17.3 19.4 14.4 21.2 12.48 22 11.89 22 11.256 22 6.15 17.523 2 12 2z"/></svg>
         <div class="badge" id="memberBadge" style="display:none;">✓</div>
       </button>
-      <button class="icon-btn" onclick="showPage('cart')">🛍️<div class="badge">2</div></button>
+      <button class="icon-btn" onclick="showPage('cart')">🛍️<div class="badge" id="cartBadge" style="display:none;">0</div></button>
     </div>
   </div>
 </header>
@@ -1550,9 +1550,14 @@ function addToCart() {
 }
 
 function updateCartBadge() {
-  // 更新購物車圖示數字
-  const badges = document.querySelectorAll('.icon-btn .badge');
-  if (badges.length >= 2) badges[1].textContent = cart.length;
+  const badge = document.getElementById('cartBadge');
+  if (!badge) return;
+  if (cart.length > 0) {
+    badge.textContent = cart.length;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
 }
 
 function renderCart() {
@@ -1875,6 +1880,7 @@ function showLineLogin() {
 loadProducts();
 initMember();
 handleLineCallback();
+updateCartBadge(); // 初始化購物車圖示
 
 // ════════════════════════════════════
 // 運費自動計算
