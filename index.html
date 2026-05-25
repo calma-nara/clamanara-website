@@ -840,6 +840,60 @@
         <button onclick="memberLogout()" style="margin-left:auto; font-size:11px; color:var(--text-muted); background:none; border:1px solid var(--border); border-radius:var(--radius-full); padding:4px 10px; cursor:pointer;">登出</button>
       </div>
       <div id="ordersRealList"></div>
+
+      <!-- 點數兌換區 -->
+      <div id="pointsRedeemSection" style="margin-top:16px; display:none;">
+        <div style="font-family:var(--font-serif); font-size:15px; font-weight:500; color:var(--espresso); margin-bottom:12px;">⭐ 點數兌換</div>
+
+        <!-- 5點：免運券 -->
+        <div id="redeemCard5" style="background:var(--white); border-radius:var(--radius-md); padding:16px; margin-bottom:10px; box-shadow:0 2px 10px var(--shadow); border:1.5px solid var(--border);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div>
+              <div style="font-size:14px; font-weight:500; color:var(--espresso);">🚚 免運券</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">免收運費，限單次使用</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:18px; font-weight:600; color:var(--caramel);">5 點</div>
+            </div>
+          </div>
+          <button id="redeemBtn5" onclick="redeemCoupon(5,'免運券')"
+            style="width:100%; padding:10px; border-radius:var(--radius-full); font-size:13px; font-weight:500; cursor:pointer; transition:all 0.3s; font-family:var(--font-body);">
+            兌換
+          </button>
+        </div>
+
+        <!-- 10點：折價券 -->
+        <div id="redeemCard10" style="background:var(--white); border-radius:var(--radius-md); padding:16px; margin-bottom:10px; box-shadow:0 2px 10px var(--shadow); border:1.5px solid var(--border);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div>
+              <div style="font-size:14px; font-weight:500; color:var(--espresso);">💰 NT$200 折價券</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">折抵 NT$200，限單次使用</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:18px; font-weight:600; color:var(--caramel);">10 點</div>
+            </div>
+          </div>
+          <button id="redeemBtn10" onclick="redeemCoupon(10,'NT$200折價券')"
+            style="width:100%; padding:10px; border-radius:var(--radius-full); font-size:13px; font-weight:500; cursor:pointer; transition:all 0.3s; font-family:var(--font-body);">
+            兌換
+          </button>
+        </div>
+
+        <!-- 使用條款 -->
+        <div style="background:var(--latte); border-radius:var(--radius-sm); padding:12px; font-size:11px; color:var(--text-muted); line-height:1.7;">
+          📋 <strong style="color:var(--mocha);">使用條款</strong><br>
+          • 兩項折扣無法併用<br>
+          • 折價券限單次消費使用<br>
+          • 僅限 Calma·Nära 娃家人產品<br>
+          • Calma·Nära 保留隨時修改、變更、暫停或終止本活動內容之權利
+        </div>
+      </div>
+
+      <!-- 我的折價券 -->
+      <div id="myCouponsSection" style="margin-top:16px; display:none;">
+        <div style="font-family:var(--font-serif); font-size:15px; font-weight:500; color:var(--espresso); margin-bottom:12px;">🎫 我的折價券</div>
+        <div id="myCouponsList"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -2030,11 +2084,16 @@ async function handleLineCallback() {
   const state = urlParams.get("state");
   const savedState = localStorage.getItem("line_state");
 
-  if (!code || state !== savedState) return;
+  // 嚴格驗證：code 和 state 都必須存在且相符
+  if (!code || !state || !savedState || state !== savedState) return;
 
-  // 清除 URL 參數
+  // 立即清除 URL 參數和 state，防止重複觸發
   window.history.replaceState({}, document.title, window.location.pathname);
   localStorage.removeItem("line_state");
+
+  // 防止重複處理
+  if (localStorage.getItem("line_processing") === "true") return;
+  localStorage.setItem("line_processing", "true");
 
   showLineToast("💚 LINE 登入中，請稍候⋯");
 
@@ -2051,9 +2110,11 @@ async function handleLineCallback() {
         pictureUrl: data.profile.pictureUrl || '',
         phone: "",
         orders: data.orders || [],
-        points: data.points || 0
+        points: data.points || 0,
+        coupons: data.coupons || []
       };
       localStorage.setItem("clama_member", JSON.stringify(currentMember));
+      localStorage.removeItem("line_processing");
       updateMemberUI();
       renderOrdersPage();
       autoFillOrderForm();
@@ -2063,6 +2124,8 @@ async function handleLineCallback() {
     }
   } catch(e) {
     showLineToast("⚠️ 登入失敗：" + e.message);
+  } finally {
+    localStorage.removeItem("line_processing");
   }
 }
 
@@ -2184,6 +2247,12 @@ function renderOrdersPage() {
   if (nameEl)  nameEl.textContent  = (currentMember.name || '—') + ' 👋';
   if (countEl) countEl.textContent = `共 ${(currentMember.orders||[]).length} 筆訂單　⭐ ${currentMember.points || 0} 點`;
 
+  // 顯示兌換區和折價券
+  const redeemSection = document.getElementById('pointsRedeemSection');
+  if (redeemSection) redeemSection.style.display = 'block';
+  updateRedeemButtons();
+  renderMyCoupons();
+
   const orders = currentMember.orders || [];
   if (!realList) return;
 
@@ -2245,6 +2314,119 @@ function autoFillOrderForm() {
   if (nameEl && currentMember.name) nameEl.value = currentMember.name;
   if (lineEl && currentMember.lineName) lineEl.value = currentMember.lineName;
   if (phoneEl && currentMember.phone) phoneEl.value = currentMember.phone;
+}
+
+// ════════════════════════════════════
+// 點數兌換系統
+// ════════════════════════════════════
+function updateRedeemButtons() {
+  const points = currentMember ? (currentMember.points || 0) : 0;
+
+  const btn5  = document.getElementById('redeemBtn5');
+  const btn10 = document.getElementById('redeemBtn10');
+
+  if (btn5) {
+    if (points >= 5) {
+      btn5.style.background = 'var(--caramel)';
+      btn5.style.color = 'white';
+      btn5.style.border = 'none';
+      btn5.disabled = false;
+    } else {
+      btn5.style.background = 'var(--latte)';
+      btn5.style.color = 'var(--text-muted)';
+      btn5.style.border = '1.5px solid var(--border)';
+      btn5.disabled = true;
+      btn5.textContent = `兌換（需 5 點，目前 ${points} 點）`;
+    }
+    if (points >= 5) btn5.textContent = '立即兌換 →';
+  }
+
+  if (btn10) {
+    if (points >= 10) {
+      btn10.style.background = 'var(--caramel)';
+      btn10.style.color = 'white';
+      btn10.style.border = 'none';
+      btn10.disabled = false;
+    } else {
+      btn10.style.background = 'var(--latte)';
+      btn10.style.color = 'var(--text-muted)';
+      btn10.style.border = '1.5px solid var(--border)';
+      btn10.disabled = true;
+      btn10.textContent = `兌換（需 10 點，目前 ${points} 點）`;
+    }
+    if (points >= 10) btn10.textContent = '立即兌換 →';
+  }
+}
+
+async function redeemCoupon(requiredPoints, couponName) {
+  if (!currentMember) {
+    showLineToast('⚠️ 請先 LINE 登入');
+    return;
+  }
+  const points = currentMember.points || 0;
+  if (points < requiredPoints) {
+    showLineToast(`⚠️ 點數不足，需要 ${requiredPoints} 點`);
+    return;
+  }
+
+  const btn = document.getElementById('redeemBtn' + requiredPoints);
+  if (btn) { btn.textContent = '處理中…'; btn.disabled = true; }
+
+  try {
+    const res = await fetch(API_URL + '?action=redeemCoupon&lineUserId=' +
+      encodeURIComponent(currentMember.lineId) +
+      '&lineName=' + encodeURIComponent(currentMember.name) +
+      '&couponName=' + encodeURIComponent(couponName) +
+      '&requiredPoints=' + requiredPoints);
+    const data = await res.json();
+
+    if (data.success) {
+      // 更新本地點數
+      currentMember.points = data.remainingPoints;
+      currentMember.coupons = data.coupons || [];
+      localStorage.setItem('clama_member', JSON.stringify(currentMember));
+
+      showLineToast(`🎫 ${couponName} 兌換成功！剩餘 ${data.remainingPoints} 點`);
+      updateRedeemButtons();
+      renderMyCoupons();
+
+      // 更新訂單頁面點數顯示
+      const countEl = document.getElementById('ordersPageCount');
+      if (countEl) countEl.textContent = `共 ${(currentMember.orders||[]).length} 筆訂單　⭐ ${currentMember.points} 點`;
+    } else {
+      showLineToast('❌ 兌換失敗：' + (data.error || '請稍後再試'));
+    }
+  } catch(e) {
+    showLineToast('❌ 網路錯誤，請稍後再試');
+  } finally {
+    updateRedeemButtons();
+  }
+}
+
+function renderMyCoupons() {
+  const section = document.getElementById('myCouponsSection');
+  const list    = document.getElementById('myCouponsList');
+  if (!section || !list || !currentMember) return;
+
+  const coupons = currentMember.coupons || [];
+  const unused  = coupons.filter(c => c.status === '未使用');
+
+  if (unused.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+  list.innerHTML = unused.map(c => `
+    <div style="background:linear-gradient(135deg, var(--latte), var(--cream)); border-radius:var(--radius-md); padding:14px 16px; margin-bottom:8px; border:1.5px dashed var(--caramel); display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-size:14px; font-weight:500; color:var(--espresso);">${c.couponName}</div>
+        <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">券號：${c.couponCode}</div>
+        <div style="font-size:10px; color:var(--text-muted);">兌換時間：${c.redeemedAt}</div>
+      </div>
+      <div style="font-size:11px; background:var(--blush); color:var(--espresso); padding:4px 10px; border-radius:var(--radius-full); font-weight:500;">未使用</div>
+    </div>
+  `).join('');
 }
 
 // ════════════════════════════════════
