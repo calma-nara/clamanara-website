@@ -1135,9 +1135,14 @@
         <div id="memberAvatarEmoji" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:24px;">🤍</div>
       </div>
         <div>
-          <div style="font-family:var(--font-serif); font-size:16px; font-weight:500; color:var(--espresso);" id="profileName">—</div>
+              <div style="font-family:var(--font-serif); font-size:16px; font-weight:500; color:var(--espresso);" id="profileName">—</div>
           <div style="font-size:12px; color:var(--text-muted);" id="profilePhone">—</div>
           <div style="font-size:11px; color:var(--sage); margin-top:2px;" id="profileOrderCount">—</div>
+          <div style="display:inline-flex; align-items:center; gap:4px; background:var(--latte); border-radius:var(--radius-full); padding:3px 10px; margin-top:4px;">
+            <span style="font-size:13px;">⭐</span>
+            <span style="font-size:12px; font-weight:600; color:var(--caramel);" id="profilePoints">0</span>
+            <span style="font-size:11px; color:var(--text-muted);">點</span>
+          </div>
         </div>
       </div>
 
@@ -1977,6 +1982,23 @@ function updateOrderTotal() {
 }
 
 // ════════════════════════════════════
+// 點數規則
+// ════════════════════════════════════
+const POINTS_RULES = {
+  'Jellycat': 1,    // 每件 1 點
+  '吊飾': 0.5,      // 每件 0.5 點
+  '零食': 0,
+  '日本團': 0,
+  '韓國團': 0,
+};
+
+function calcPoints(productName, category, qty) {
+  const rule = POINTS_RULES[category];
+  if (!rule) return 0;
+  return rule * (parseInt(qty) || 1);
+}
+
+// ════════════════════════════════════
 // LINE Login
 // ════════════════════════════════════
 
@@ -2020,7 +2042,8 @@ async function handleLineCallback() {
         lineId: data.profile.userId,
         pictureUrl: data.profile.pictureUrl || '',
         phone: "",
-        orders: data.orders || []
+        orders: data.orders || [],
+        points: data.points || 0
       };
       localStorage.setItem("clama_member", JSON.stringify(currentMember));
       updateMemberUI();
@@ -2080,6 +2103,10 @@ function showMemberProfile() {
   document.getElementById('profilePhone').textContent = currentMember.phone || currentMember.lineId || '—';
   document.getElementById('profileOrderCount').textContent =
     `共 ${(currentMember.orders || []).length} 筆訂單`;
+  // 顯示點數
+  const pointsEl = document.getElementById('profilePoints');
+  if (pointsEl) pointsEl.textContent = (currentMember.points || 0).toFixed(1).replace('.0', '');
+
   // 顯示 LINE 頭像
   if (currentMember.pictureUrl) {
     const img = document.getElementById('memberAvatarImg');
@@ -2135,7 +2162,7 @@ function renderOrdersPage() {
   const nameEl  = document.getElementById('ordersPageName');
   const countEl = document.getElementById('ordersPageCount');
   if (nameEl)  nameEl.textContent  = (currentMember.name || '—') + ' 👋';
-  if (countEl) countEl.textContent = `共 ${(currentMember.orders||[]).length} 筆訂單`;
+  if (countEl) countEl.textContent = `共 ${(currentMember.orders||[]).length} 筆訂單　⭐ ${currentMember.points || 0} 點`;
 
   const orders = currentMember.orders || [];
   if (!realList) return;
