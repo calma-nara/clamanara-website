@@ -1515,8 +1515,8 @@ function showPage(name) {
   const navEl = document.getElementById('nav-' + name);
   if (navEl) navEl.classList.add('active');
   window.scrollTo(0, 0);
-  if (name === 'cart') renderCart();
-  if (name === 'orders') renderOrdersPage();
+  if (name === 'cart') { try { renderCart(); } catch(e) { console.error('renderCart error:', e); } }
+  if (name === 'orders') { try { renderOrdersPage(); } catch(e) { console.error('renderOrdersPage error:', e); } }
 }
 
 // ════════════════════════════════════
@@ -1692,13 +1692,16 @@ function checkoutFromCart() {
   const productNames = mergedList.map(i => `${i.name}（${i.selectedColor}）x${i.qty}`).join('\n');
 
   // 設定 currentProduct 供下單使用
+  // 取得購物車商品的分類（取第一件商品的分類）
+  const cartCategory = mergedList.length === 1 ? (mergedList[0].category || '') : 'mixed';
   currentProduct = {
     ...cart[0],
     priceNum: subtotal,
     name: productNames,
     isCartCheckout: true,
     cartFee: fee,
-    cartTotal: total
+    cartTotal: total,
+    category: cartCategory
   };
   qty = mergedList.reduce((s,i) => s + i.qty, 0);
 
@@ -1748,6 +1751,8 @@ function buyNow() {
 
 function closeOverlay() {
   document.getElementById('buyOverlay').classList.remove('show');
+  const btn = document.getElementById('confirmBtn');
+  if (btn) { btn.setAttribute('data-sending','false'); btn.textContent='確認下單 💛'; btn.disabled=false; }
 }
 
 // ════════════════════════════════════
@@ -1794,8 +1799,10 @@ async function confirmOrder() {
   const productPrice = currentProduct ? currentProduct.priceNum * qty : 0;
   const totalPrice = productPrice + shippingFee;
 
-  // 按鈕 loading 狀態
+  // 防止重複送出
   const btn = document.getElementById('confirmBtn');
+  if (btn.getAttribute('data-sending') === 'true') return;
+  btn.setAttribute('data-sending', 'true');
   btn.textContent = '送出中…';
   btn.disabled = true;
 
@@ -1825,14 +1832,11 @@ async function confirmOrder() {
     status:       '待確認',
     notified:     '否',
     lineUserId:   currentMember ? (currentMember.lineId || '') : '',
+    category:     currentProduct ? (currentProduct.category || '') : '',
   };
 
   try {
-    // 方法1: GET 參數方式（最相容 Google Apps Script）
-    const getUrl = API_URL + '?payload=' + encodeURIComponent(JSON.stringify(orderData));
-    fetch(getUrl, { method: 'GET', mode: 'no-cors' }).catch(() => {});
-
-    // 方法2: POST no-cors 雙保險
+    // 送出訂單（只用一次 POST，避免重複通知）
     fetch(API_URL, {
       method: 'POST',
       mode: 'no-cors',
@@ -1863,6 +1867,7 @@ async function confirmOrder() {
   } finally {
     btn.textContent = '確認下單 💛';
     btn.disabled = false;
+    btn.setAttribute('data-sending', 'false');
   }
 }
 
