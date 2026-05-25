@@ -2150,6 +2150,18 @@ function memberLogout() {
   showLineToast('👋 已登出會員');
 }
 
+function formatOrderTime(t) {
+  if (!t) return '—';
+  try {
+    const d = new Date(t);
+    if (isNaN(d)) return t;
+    return d.toLocaleDateString('zh-TW', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', hour12: false
+    });
+  } catch(e) { return t; }
+}
+
 function renderOrdersPage() {
   const loginPrompt = document.getElementById('ordersLoginPrompt');
   const ordersList  = document.getElementById('ordersList');
@@ -2192,19 +2204,19 @@ function renderOrdersPage() {
         <div class="order-card-header">
           <div>
             <div class="order-no">訂單 #${o.orderId || '—'}</div>
-            <div class="order-date">${o.orderTime || '—'}</div>
+            <div class="order-date">${formatOrderTime(o.orderTime)}</div>
           </div>
           <span class="order-status ${statusClass}">${statusIcon} ${o.status || '待確認'}</span>
         </div>
         <div class="order-items">
           <div class="order-item-row">
             <span>${o.product || '—'} ${o.color ? '(' + o.color + ')' : ''}</span>
-            <span>${o.price || '—'}</span>
+            <span>${o.price ? (String(o.price).includes('NT') ? o.price : 'NT$'+Number(o.price).toLocaleString()) : '—'}</span>
           </div>
         </div>
         <div class="order-footer">
           <span class="order-ship">🚚 ${o.shipping || '—'}</span>
-          <span class="order-total">合計 ${o.price || '—'}</span>
+          <span class="order-total">合計 ${o.price ? (String(o.price).includes('NT') ? o.price : 'NT$'+Number(o.price).toLocaleString()) : '—'}</span>
         </div>
       </div>`;
   }).join('');
