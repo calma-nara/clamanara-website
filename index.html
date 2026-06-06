@@ -1926,7 +1926,8 @@ async function confirmOrder() {
   } else if (appliedCoupon?.couponName === 'NT$200折價券') {
     discountAmount = 200;
   }
-  const productPrice = currentProduct ? currentProduct.priceNum * qty : 0;
+  // 購物車結帳時 priceNum 已含數量，單品結帳才需乘qty
+  const productPrice = currentProduct ? (currentProduct.isCartCheckout ? currentProduct.priceNum : currentProduct.priceNum * qty) : 0;
   const totalPrice = Math.max(0, productPrice + shippingFee - discountAmount);
 
   // 防止重複送出
@@ -2125,7 +2126,8 @@ function updateOrderTotal() {
   if (!sel) return;
   const selectedOption = sel.options[sel.selectedIndex];
   const fee = parseInt(selectedOption.getAttribute('data-fee')) || 0;
-  const productPrice = currentProduct ? currentProduct.priceNum * qty : 0;
+  // 購物車結帳時 priceNum 已含數量，單品結帳才需乘qty
+  const productPrice = currentProduct ? (currentProduct.isCartCheckout ? currentProduct.priceNum : currentProduct.priceNum * qty) : 0;
   const total = productPrice + fee;
   const feeShip = document.getElementById('feeShipping');
   const feeProd = document.getElementById('feeProduct');
