@@ -1557,6 +1557,17 @@ function openDetail(id) {
     stockEl.textContent = '📦 預購中，下單後安排出貨';
     stockEl.style.color = 'var(--text-muted)';
   }
+  // 重置數量並更新上限
+  qty = 1;
+  const qtyDisplay = document.getElementById('qtyDisplay');
+  if (qtyDisplay) qtyDisplay.textContent = '1';
+  const plusBtn = document.getElementById('qtyPlus');
+  if (plusBtn) {
+    const maxQty = p.stock;
+    plusBtn.disabled = p.status === 'instock' && maxQty <= 1;
+    plusBtn.style.opacity = (p.status === 'instock' && maxQty <= 1) ? '0.4' : '';
+  }
+
   // 庫存=0 時鎖住購買按鈕
   const buyBtn = document.querySelector('#page-detail .btn-primary');
   const cartBtn = document.querySelector('#page-detail .btn-outline');
@@ -1628,8 +1639,16 @@ function selectChip(el) {
 }
 
 function changeQty(d) {
-  qty = Math.max(1, qty + d);
+  const maxQty = currentProduct ? currentProduct.stock : 99;
+  const limit = (currentProduct?.status === 'instock' && maxQty > 0) ? maxQty : 99;
+  qty = Math.max(1, Math.min(limit, qty + d));
   document.getElementById('qtyDisplay').textContent = qty;
+  // 更新＋按鈕狀態
+  const plusBtn = document.getElementById('qtyPlus');
+  if (plusBtn) {
+    plusBtn.disabled = qty >= limit;
+    plusBtn.style.opacity = qty >= limit ? '0.4' : '';
+  }
 }
 
 // ════════════════════════════════════
