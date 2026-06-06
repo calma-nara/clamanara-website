@@ -1983,13 +1983,15 @@ async function confirmOrder() {
   };
 
   try {
-    // 送出訂單（只用一次 POST，避免重複通知）
-    fetch(API_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify(orderData),
-    }).catch(() => {});
+    // 送出訂單（用 GET + payload 方式，最相容 Apps Script）
+    console.log('送出訂單資料:', JSON.stringify(orderData));
+    try {
+      const getUrl = API_URL + '?payload=' + encodeURIComponent(JSON.stringify(orderData));
+      await fetch(getUrl, { method: 'GET', mode: 'no-cors' });
+      console.log('訂單送出完成（GET）');
+    } catch(err) {
+      console.error('訂單送出失敗:', err);
+    }
 
     // 等1秒讓請求送出
     await new Promise(resolve => setTimeout(resolve, 1000));
