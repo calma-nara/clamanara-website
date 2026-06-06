@@ -1934,11 +1934,9 @@ async function confirmOrder() {
   const btn = document.getElementById('confirmBtn');
   if (btn.getAttribute('data-sending') === 'true') return;
 
-  // 驗證數量不超過庫存
-  if (currentProduct && currentProduct.status === 'instock' && currentProduct.stock > 0) {
-    const orderQtyEl = document.getElementById('orderQty');
-    const orderQty = orderQtyEl ? parseInt(orderQtyEl.value) || qty : qty;
-    if (orderQty > currentProduct.stock) {
+  // 驗證數量不超過庫存（購物車結帳跳過，單品才驗證）
+  if (currentProduct && !currentProduct.isCartCheckout && currentProduct.status === 'instock' && currentProduct.stock > 0) {
+    if (qty > currentProduct.stock) {
       showLineToast(`⚠️ 數量不可超過庫存 ${currentProduct.stock} 件`);
       return;
     }
@@ -1953,8 +1951,8 @@ async function confirmOrder() {
   const orderId = 'CN' + String(now.getFullYear()).slice(2) + String(now.getMonth()+1).padStart(2,'0')
     + '-' + String(Math.floor(Math.random()*9000)+1000);
 
-  // 強制限制數量不超過庫存
-  if (currentProduct && currentProduct.status === 'instock' && currentProduct.stock > 0) {
+  // 強制限制數量不超過庫存（購物車結帳跳過）
+  if (currentProduct && !currentProduct.isCartCheckout && currentProduct.status === 'instock' && currentProduct.stock > 0) {
     qty = Math.min(qty, currentProduct.stock);
   }
 
