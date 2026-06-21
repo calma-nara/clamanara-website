@@ -485,7 +485,7 @@
 
   <div class="announce">
     <span class="tag">📢 公告</span>
-    <span class="announce-text">七月份日本連線時間 7/5 ~ 7/10，把握機會跟上連線 🌙</span>
+    <span class="announce-text" id="announceText">七月份日本連線時間 7/5 ~ 7/10，把握機會跟上連線 🌙</span>
   </div>
 
   <div class="section-card">
@@ -526,12 +526,8 @@
   </div>
 
   <div class="section-card" id="homeTab0">
-    <div class="product-list">
-      <div class="product-item"><div class="product-rank top">1</div><div class="product-img">🧥</div><div class="product-info"><div class="product-name">Seoul Linen Oversized Shirt</div><div class="product-cat">韓國連線 · 服裝</div></div><div class="product-meta"><div class="product-sold">已售 <strong>42</strong> 件</div><div class="chevron">›</div></div></div>
-      <div class="product-item"><div class="product-rank top">2</div><div class="product-img">🌸</div><div class="product-info"><div class="product-name">Japanese Tsubaki 椿油護髮精華</div><div class="product-cat">日本連線 · 美妝</div></div><div class="product-meta"><div class="product-sold">已售 <strong>38</strong> 件</div><div class="chevron">›</div></div></div>
-      <div class="product-item"><div class="product-rank">3</div><div class="product-img">🎒</div><div class="product-info"><div class="product-name">Roots Canada 帆布托特包</div><div class="product-cat">加拿大連線 · 雜貨</div></div><div class="product-meta"><div class="product-sold">已售 <strong>31</strong> 件</div><div class="chevron">›</div></div></div>
-      <div class="product-item"><div class="product-rank">4</div><div class="product-img">🧴</div><div class="product-info"><div class="product-name">Innisfree 濟州火山岩毛孔面膜</div><div class="product-cat">韓國連線 · 美妝</div></div><div class="product-meta"><div class="product-sold">已售 <strong>27</strong> 件</div><div class="chevron">›</div></div></div>
-      <div class="product-item"><div class="product-rank">5</div><div class="product-img">🏮</div><div class="product-info"><div class="product-name">3COINS 日系陶器擴香組</div><div class="product-cat">日本連線 · 雜貨</div></div><div class="product-meta"><div class="product-sold">已售 <strong>24</strong> 件</div><div class="chevron">›</div></div></div>
+    <div class="product-list" id="hotProductsList">
+      <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">載入中…</div>
     </div>
   </div>
 
@@ -575,7 +571,7 @@
   </div>
   <div class="section-card" style="margin-top:8px;">
     <div class="cat-search"><span style="color:var(--text-muted);font-size:16px;">🔍</span><input type="text" placeholder="搜尋連線商品…"></div>
-    <div class="cat-grid">
+    <div class="cat-grid" id="liveCatGrid">
       <div class="cat-item" onclick="showToast('生日城・87 款商品')"><div><div class="cat-item-name">生日城</div><div class="cat-item-count">87 款商品</div></div><span style="color:var(--text-muted);font-size:14px;">›</span></div>
       <div class="cat-item" onclick="showToast('藥妝店・152 款商品')"><div><div class="cat-item-name">藥妝店</div><div class="cat-item-count">152 款商品</div></div><span style="color:var(--text-muted);font-size:14px;">›</span></div>
     </div>
@@ -590,7 +586,7 @@
   </div>
   <div class="section-card" style="margin-top:8px;">
     <div class="cat-search"><span style="color:var(--text-muted);font-size:16px;">🔍</span><input type="text" placeholder="在此分類搜尋…"></div>
-    <div class="cat-grid">
+    <div class="cat-grid" id="purchaseCatGrid">
       <div class="cat-item" onclick="showToast('日本雜貨・40 款')"><div><div class="cat-item-name">日本雜貨</div><div class="cat-item-count">40 款商品</div></div><span style="color:var(--text-muted);">›</span></div>
       <div class="cat-item" onclick="showToast('韓國服裝・19 款')"><div><div class="cat-item-name">韓國服裝</div><div class="cat-item-count">19 款商品</div></div><span style="color:var(--text-muted);">›</span></div>
       <div class="cat-item" onclick="showToast('美妝保養・2 款')"><div><div class="cat-item-name">美妝保養</div><div class="cat-item-count">2 款商品</div></div><span style="color:var(--text-muted);">›</span></div>
@@ -609,7 +605,7 @@
   </div>
   <div class="section-card" style="margin-top:8px;">
     <div class="cat-search"><span style="color:var(--text-muted);font-size:16px;">🔍</span><input type="text" placeholder="在此分類搜尋…"></div>
-    <div class="cat-grid">
+    <div class="cat-grid" id="instockCatGrid">
       <div class="cat-item" onclick="showToast('現貨服裝・12 款')"><div><div class="cat-item-name">現貨服裝</div><div class="cat-item-count">12 款商品</div></div><span style="color:var(--text-muted);">›</span></div>
       <div class="cat-item" onclick="showToast('日系雜貨・7 款')"><div><div class="cat-item-name">日系雜貨</div><div class="cat-item-count">7 款商品</div></div><span style="color:var(--text-muted);">›</span></div>
       <div class="cat-item" onclick="showToast('母嬰用品・142 款')"><div><div class="cat-item-name">母嬰用品</div><div class="cat-item-count">142 款商品</div></div><span style="color:var(--text-muted);">›</span></div>
@@ -716,7 +712,7 @@
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFirestore, collection, getDocs, doc, getDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAaba2qOBIfHGG6J4677EDfMGA4ca7FJ0s",
@@ -733,6 +729,125 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let currentUser = null;
+
+// ── Load site settings (announce, banners, rates) ──
+async function loadSiteSettings() {
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'site'));
+    if (snap.exists()) {
+      const data = snap.data();
+      // Update announcement
+      if (data.announce) {
+        document.getElementById('announceText').textContent = data.announce;
+      }
+      // Update banners
+      if (data.banners && data.banners.length > 0) {
+        renderBanners(data.banners);
+      }
+      // Update rates in info tab
+      if (data.rates) {
+        const r = data.rates;
+        const rateHTML = `
+          <div class="info-title">📢 匯率說明</div>
+          <div style="background:var(--sage);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--espresso);">
+            代購售價：<span class="info-highlight">吊牌當地幣（含稅）× 品牌匯率 = 台幣</span>
+          </div>
+          <div class="info-block"><div class="info-block-title">🇯🇵 日本連線</div><ul class="info-rules">
+            <li><span class="num">•</span>一般商品匯率 <strong>${r.JP||'0.22'}</strong></li>
+            <li><span class="num">•</span>藥妝 / 美妝系列匯率 <strong>${r.JPCosmetic||'0.23'}</strong></li>
+          </ul></div>
+          <div class="info-block"><div class="info-block-title">🇰🇷 韓國連線</div><ul class="info-rules">
+            <li><span class="num">•</span>服裝 / 雜貨匯率 <strong>${r.KR||'0.024'}</strong></li>
+            <li><span class="num">•</span>美妝系列匯率 <strong>${r.KRCosmetic||'0.025'}</strong></li>
+          </ul></div>
+          <div class="info-block"><div class="info-block-title">🇨🇦 加拿大連線</div><ul class="info-rules">
+            <li><span class="num">•</span>全品項匯率 <strong>${r.CA||'22'}</strong>（加幣×${r.CA||'22'}=台幣）</li>
+          </ul></div>
+          <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">匯率更新時間：${new Date().toLocaleDateString('zh-TW')}</p>`;
+        document.querySelector('#homeTab2 .info-section').innerHTML = rateHTML;
+      }
+    }
+  } catch(e) { console.log('Settings load error:', e); }
+}
+
+// ── Render Banners ──
+function renderBanners(banners) {
+  const colors = ['#EDE0D0','#E8C4B8','#B5C4B1','#EDE0D0'];
+  const track = document.getElementById('bannerTrack');
+  const dotsEl = document.getElementById('bannerDots');
+  track.innerHTML = banners.map(b => `
+    <div class="banner-slide" style="background:linear-gradient(135deg,#FAF6F1,${b.color||colors[0]});">
+      <div class="bg">${b.emoji||'🌙'}</div>
+      <div class="content">
+        <span class="label">${b.label||''}</span>
+        <h2>${(b.title||'').replace(/\\n/g,'<br>')}</h2>
+        <p>${b.sub||''}</p>
+      </div>
+    </div>`).join('');
+  dotsEl.innerHTML = banners.map((_,i) => `<span class="${i===0?'active':''}"></span>`).join('');
+  // Re-init slider
+  slideCount = banners.length;
+  currentSlide = 0;
+  dotsEl.querySelectorAll('span').forEach((d,i) => d.addEventListener('click', () => goSlide(i)));
+}
+
+// ── Load Products ──
+async function loadProducts() {
+  try {
+    const snap = await getDocs(collection(db, 'products'));
+    const products = snap.docs.map(d => ({id: d.id, ...d.data()})).filter(p => p.active !== false);
+
+    // Hot products (all active, sorted by sold count)
+    const sorted = [...products].sort((a,b) => (b.soldCount||0) - (a.soldCount||0));
+    const hotEl = document.getElementById('hotProductsList');
+    if (sorted.length === 0) {
+      hotEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">商品即將上架</div>';
+    } else {
+      hotEl.innerHTML = sorted.slice(0,8).map((p,i) => `
+        <div class="product-item" onclick="showToast('${p.name}')">
+          <div class="product-rank ${i<3?'top':''}">${i+1}</div>
+          <div class="product-img">${p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">` : p.emoji||'📦'}</div>
+          <div class="product-info">
+            <div class="product-name">${p.name}</div>
+            <div class="product-cat">${p.category||''}</div>
+          </div>
+          <div class="product-meta">
+            <div class="product-sold">NT$<strong>${Number(p.price||0).toLocaleString()}</strong></div>
+            <div class="chevron">›</div>
+          </div>
+        </div>`).join('');
+    }
+
+    // Category pages — update counts
+    const preorder = products.filter(p => p.type === '預購');
+    const instock = products.filter(p => p.type === '現貨');
+    const live = products.filter(p => p.type === '連線');
+
+    renderCategoryGrid('purchaseCatGrid', preorder);
+    renderCategoryGrid('instockCatGrid', instock);
+    renderCategoryGrid('liveCatGrid', live);
+  } catch(e) { console.log('Products load error:', e); }
+}
+
+function renderCategoryGrid(gridId, products) {
+  const el = document.getElementById(gridId);
+  if (!el) return;
+  const cats = {};
+  products.forEach(p => { cats[p.category||'其他'] = (cats[p.category||'其他']||0)+1; });
+  if (Object.keys(cats).length === 0) {
+    el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">商品即將上架</div>';
+    return;
+  }
+  el.innerHTML = Object.entries(cats).map(([cat,count]) => `
+    <div class="cat-item" onclick="showToast('${cat}・${count} 款商品')">
+      <div><div class="cat-item-name">${cat}</div><div class="cat-item-count">${count} 款商品</div></div>
+      <span style="color:var(--text-muted);">›</span>
+    </div>`).join('');
+}
+
+// Run on load
+loadSiteSettings();
+loadProducts();
 
 // Auth state listener
 onAuthStateChanged(auth, (user) => {
@@ -868,16 +983,16 @@ function renderOrdersLoggedOut() {
 
 <script>
 // Banner
-let slide = 0;
+let currentSlide = 0;
+let slideCount = 3;
 const track = document.getElementById('bannerTrack');
-const dots = document.querySelectorAll('#bannerDots span');
 function goSlide(n) {
-  slide = (n + 3) % 3;
-  track.style.transform = 'translateX(-' + (slide * 100) + '%)';
-  dots.forEach((d,i) => d.classList.toggle('active', i === slide));
+  currentSlide = (n + slideCount) % slideCount;
+  track.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
+  document.querySelectorAll('#bannerDots span').forEach((d,i) => d.classList.toggle('active', i === currentSlide));
 }
-setInterval(() => goSlide(slide + 1), 4000);
-dots.forEach((d,i) => d.addEventListener('click', () => goSlide(i)));
+setInterval(() => goSlide(currentSlide + 1), 4000);
+document.querySelectorAll('#bannerDots span').forEach((d,i) => d.addEventListener('click', () => goSlide(i)));
 
 // Pages
 function showPage(id) {
