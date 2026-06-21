@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌙 Calma • Nära 後台管理</title>
+<style>
+  :root {
+    --cream: #FAF6F1; --latte: #EDE0D0; --caramel: #C8A882;
+    --mocha: #7A5C44; --espresso: #3D2B1F; --blush: #E8C4B8;
+    --sage: #B5C4B1; --white: #FFFFFF; --text-body: #5C4033;
+    --text-muted: #A08878; --border: #DDD0C0; --shadow: rgba(122,92,68,0.10);
+    --red: #C0392B; --green: #27AE60; --orange: #E67E22; --blue: #2980B9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'PingFang TC', sans-serif; background: #F5F0EB; color: var(--text-body); min-height: 100vh; }
+
+  /* ── Login ── */
+  #loginScreen {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--cream), var(--latte));
+  }
+  .login-box {
+    background: var(--white); border-radius: 20px;
+    padding: 40px 36px; width: 380px;
+    box-shadow: 0 8px 40px var(--shadow);
+  }
+  .login-logo { font-size: 32px; text-align: center; margin-bottom: 8px; }
+  .login-title { font-size: 20px; font-weight: 700; color: var(--espresso); text-align: center; margin-bottom: 4px; }
+  .login-sub { font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 28px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { font-size: 13px; font-weight: 500; color: var(--mocha); display: block; margin-bottom: 6px; }
+  .form-group input {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 14px; background: var(--cream); color: var(--text-body);
+    outline: none; font-family: inherit; transition: border-color 0.2s;
+  }
+  .form-group input:focus { border-color: var(--caramel); }
+  .btn-login {
+    width: 100%; padding: 14px; background: var(--caramel); color: var(--white);
+    border: none; border-radius: 12px; font-size: 15px; font-weight: 600;
+    cursor: pointer; font-family: inherit; margin-top: 4px; transition: opacity 0.2s;
+  }
+  .btn-login:hover { opacity: 0.9; }
+  .login-error { color: var(--red); font-size: 13px; text-align: center; margin-top: 10px; display: none; }
+
+  /* ── Layout ── */
+  #adminApp { display: none; min-height: 100vh; }
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 220px;
+    background: var(--espresso); padding: 0;
+    display: flex; flex-direction: column; z-index: 100;
+  }
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .sidebar-logo .logo-text { color: var(--white); font-size: 16px; font-weight: 700; }
+  .sidebar-logo .logo-sub { color: rgba(255,255,255,0.5); font-size: 11px; margin-top: 2px; }
+  .nav-items { flex: 1; padding: 12px 0; overflow-y: auto; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 20px; cursor: pointer;
+    color: rgba(255,255,255,0.65); font-size: 14px;
+    transition: all 0.2s; border-left: 3px solid transparent;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+  .nav-item.active { background: rgba(200,168,130,0.15); color: var(--caramel); border-left-color: var(--caramel); }
+  .nav-item .nav-icon { font-size: 18px; width: 22px; text-align: center; }
+  .sidebar-bottom { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .logout-btn {
+    display: flex; align-items: center; gap: 8px;
+    color: rgba(255,255,255,0.5); font-size: 13px; cursor: pointer;
+    transition: color 0.2s; background: none; border: none; font-family: inherit;
+    width: 100%;
+  }
+  .logout-btn:hover { color: var(--blush); }
+
+  .main-content { margin-left: 220px; padding: 28px; min-height: 100vh; }
+  .page-header { margin-bottom: 24px; }
+  .page-header h1 { font-size: 22px; font-weight: 700; color: var(--espresso); }
+  .page-header p { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── Stats Cards ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--white); border-radius: 14px; padding: 20px;
+    box-shadow: 0 2px 12px var(--shadow);
+  }
+  .stat-card .stat-icon { font-size: 28px; margin-bottom: 10px; }
+  .stat-card .stat-num { font-size: 28px; font-weight: 700; color: var(--espresso); }
+  .stat-card .stat-label { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+  /* ── Table ── */
+  .card {
+    background: var(--white); border-radius: 14px;
+    box-shadow: 0 2px 12px var(--shadow); overflow: hidden; margin-bottom: 20px;
+  }
+  .card-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--latte);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-header h2 { font-size: 16px; font-weight: 600; color: var(--espresso); }
+  .card-body { padding: 0; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    padding: 12px 16px; text-align: left;
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+    background: var(--cream); border-bottom: 1px solid var(--border);
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  td { padding: 14px 16px; font-size: 14px; border-bottom: 1px solid var(--latte); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(250,246,241,0.6); }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .badge-pending { background: #FEF3E2; color: #D68910; }
+  .badge-bought { background: #E8F4FD; color: #2471A3; }
+  .badge-shipped { background: #E9F7EF; color: #1E8449; }
+  .badge-cancelled { background: #FDEDEC; color: #C0392B; }
+  .badge-preorder { background: var(--sage); color: var(--espresso); }
+  .badge-instock { background: var(--blush); color: var(--espresso); }
+
+  /* ── Buttons ── */
+  .btn {
+    padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: none; font-family: inherit; transition: opacity 0.2s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-primary { background: var(--caramel); color: var(--white); }
+  .btn-sm { padding: 5px 12px; font-size: 12px; border-radius: 6px; }
+  .btn-ghost { background: var(--latte); color: var(--mocha); }
+  .btn-danger { background: #FDEDEC; color: var(--red); }
+  .btn-success { background: #E9F7EF; color: var(--green); }
+
+  /* ── Status Select ── */
+  .status-select {
+    padding: 5px 10px; border-radius: 6px; font-size: 12px;
+    border: 1px solid var(--border); background: var(--cream);
+    color: var(--text-body); font-family: inherit; cursor: pointer;
+  }
+
+  /* ── Form ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .form-group-inline { margin-bottom: 0; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 10px 12px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-size: 14px; background: var(--cream); color: var(--text-body);
+    outline: none; font-family: inherit; transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--caramel); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-label { font-size: 13px; font-weight: 500; color: var(--mocha); display: block; margin-bottom: 6px; }
+  .form-section { background: var(--white); border-radius: 14px; padding: 20px; box-shadow: 0 2px 12px var(--shadow); margin-bottom: 16px; }
+  .form-section h3 { font-size: 15px; font-weight: 600; color: var(--espresso); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--latte); }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    z-index: 300; display: flex; align-items: center; justify-content: center;
+  }
+  .modal-box {
+    background: var(--white); border-radius: 16px; padding: 28px;
+    width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
+  }
+  .modal-title { font-size: 18px; font-weight: 700; color: var(--espresso); margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; top: 20px; right: 20px;
+    background: var(--espresso); color: var(--white);
+    padding: 12px 20px; border-radius: 10px;
+    font-size: 13px; z-index: 999;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+  .toast.show { opacity: 1; }
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--red); }
+
+  /* ── Search bar ── */
+  .search-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--cream); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 14px; width: 240px;
+  }
+  .search-bar input { background: none; border: none; outline: none; font-size: 14px; color: var(--text-body); font-family: inherit; width: 100%; }
+
+  /* ── Empty state ── */
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  /* ── Loading ── */
+  .loading { text-align: center; padding: 32px; color: var(--text-muted); font-size: 14px; }
+
+  @media (max-width: 1024px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">🌙</div>
+    <div class="login-title">Calma • Nära 後台</div>
+    <div class="login-sub">管理員專用登入</div>
+    <div class="form-group">
+      <label>管理員帳號</label>
+      <input type="email" id="adminEmail" placeholder="請輸入 Email" value="">
+    </div>
+    <div class="form-group">
+      <label>密碼</label>
+      <input type="password" id="adminPassword" placeholder="請輸入密碼" onkeydown="if(event.key==='Enter')doAdminLogin()">
+    </div>
+    <button class="btn-login" onclick="doAdminLogin()">登入後台</button>
+    <div class="login-error" id="loginError">帳號或密碼錯誤</div>
+  </div>
+</div>
+
+<!-- ── ADMIN APP ── -->
+<div id="adminApp">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-text">🌙 Calma • Nära</div>
+      <div class="logo-sub">後台管理系統</div>
+    </div>
+    <div class="nav-items">
+      <div class="nav-item active" onclick="showPanel('dashboard')">
+        <span class="nav-icon">📊</span> 總覽
+      </div>
+      <div class="nav-item" onclick="showPanel('orders')">
+        <span class="nav-icon">📋</span> 訂單管理
+      </div>
+      <div class="nav-item" onclick="showPanel('products')">
+        <span class="nav-icon">📦</span> 商品管理
+      </div>
+      <div class="nav-item" onclick="showPanel('members')">
+        <span class="nav-icon">👥</span> 會員名單
+      </div>
+      <div class="nav-item" onclick="showPanel('settings')">
+        <span class="nav-icon">⚙️</span> 公告與設定
+      </div>
+    </div>
+    <div class="sidebar-bottom">
+      <button class="logout-btn" onclick="doLogout()">🚪 登出</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main-content">
+
+    <!-- Dashboard -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="page-header">
+        <h1>總覽</h1>
+        <p id="dashDate"></p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-num" id="stat-orders">-</div><div class="stat-label">總訂單數</div></div>
+        <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-num" id="stat-pending">-</div><div class="stat-label">待採購</div></div>
+        <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-num" id="stat-members">-</div><div class="stat-label">會員人數</div></div>
+        <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-num" id="stat-products">-</div><div class="stat-label">上架商品</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h2>最新訂單</h2><button class="btn btn-ghost btn-sm" onclick="showPanel('orders')">查看全部</button></div>
+        <div class="card-body"><div id="recentOrdersTable"><div class="loading">載入中…</div></div></div>
+      </div>
+    </div>
+
+    <!-- Orders -->
+    <div class="panel" id="panel-orders">
+      <div class="page-header">
+        <h1>訂單管理</h1>
+        <p>查看與管理所有客人訂單</p>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h2>全部訂單</h2>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <select class="status-select" id="orderFilterStatus" onchange="filterOrders()">
+              <option value="">全部狀態</option>
+              <option value="待採購">待採購</option>
+              <option value="已採購">已採購</option>
+              <option value="已出貨">已出貨</option>
+              <option value="已取消">已取消</option>
+            </select>
+            <div class="search-bar"><span>🔍</span><input type="text" id="orderSearch" placeholder="搜尋訂單…" oninput="filterOrders()"></div>
+          </div>
+        </div>
+        <div class="card-body"><div id="ordersTable"><div class="loading">載入中…</div></div></div>
+      </div>
+    </div>
+
+    <!-- Products -->
+    <div class="panel" id="panel-products">
+      <div class="page-header">
+        <h1>商品管理</h1>
+        <p>新增、編輯、下架商品</p>
+      </div>
+      <div style="margin-bottom:16px;display:flex;justify-content:flex-end;">
+        <button class="btn btn-primary" onclick="openProductModal()">＋ 新增商品</button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h2>商品列表</h2>
+          <div class="search-bar"><span>🔍</span><input type="text" placeholder="搜尋商品…" oninput="filterProducts(this.value)"></div>
+        </div>
+        <div class="card-body"><div id="productsTable"><div class="loading">載入中…</div></div></div>
+      </div>
+    </div>
+
+    <!-- Members -->
+    <div class="panel" id="panel-members">
+      <div class="page-header">
+        <h1>會員名單</h1>
+        <p>查看所有註冊會員</p>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h2>會員列表</h2>
+          <div class="search-bar"><span>🔍</span><input type="text" placeholder="搜尋會員…" oninput="filterMembers(this.value)"></div>
+        </div>
+        <div class="card-body"><div id="membersTable"><div class="loading">載入中…</div></div></div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="panel" id="panel-settings">
+      <div class="page-header">
+        <h1>公告與設定</h1>
+        <p>更新網站公告、匯率、Banner</p>
+      </div>
+
+      <div class="form-section">
+        <h3>📢 首頁公告</h3>
+        <div class="form-group">
+          <label class="form-label">公告內容</label>
+          <input type="text" class="form-input" id="settingAnnounce" placeholder="輸入公告文字…">
+        </div>
+        <button class="btn btn-primary" onclick="saveSetting('announce')">儲存公告</button>
+      </div>
+
+      <div class="form-section">
+        <h3>💱 匯率設定</h3>
+        <div class="form-grid three" style="margin-bottom:16px;">
+          <div>
+            <label class="form-label">🇯🇵 日本（一般）</label>
+            <input type="number" class="form-input" id="rateJP" step="0.01" placeholder="0.22">
+          </div>
+          <div>
+            <label class="form-label">🇯🇵 日本（藥妝）</label>
+            <input type="number" class="form-input" id="rateJPCosmetic" step="0.01" placeholder="0.23">
+          </div>
+          <div>
+            <label class="form-label">🇰🇷 韓國（服裝）</label>
+            <input type="number" class="form-input" id="rateKR" step="0.001" placeholder="0.024">
+          </div>
+          <div>
+            <label class="form-label">🇰🇷 韓國（美妝）</label>
+            <input type="number" class="form-input" id="rateKRCosmetic" step="0.001" placeholder="0.025">
+          </div>
+          <div>
+            <label class="form-label">🇨🇦 加拿大</label>
+            <input type="number" class="form-input" id="rateCA" step="0.1" placeholder="22">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveSetting('rates')">儲存匯率</button>
+      </div>
+
+      <div class="form-section">
+        <h3>🖼️ 首頁 Banner</h3>
+        <div id="bannerList"></div>
+        <button class="btn btn-ghost" style="margin-top:12px;" onclick="addBannerRow()">＋ 新增 Banner</button>
+        <button class="btn btn-primary" style="margin-left:10px;" onclick="saveSetting('banners')">儲存 Banner</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── PRODUCT MODAL ── -->
+<div class="modal-overlay" id="productModal" style="display:none;" onclick="if(event.target===this)closeProductModal()">
+  <div class="modal-box">
+    <div class="modal-title" id="productModalTitle">新增商品</div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label class="form-label">商品名稱</label>
+      <input type="text" class="form-input" id="pName" placeholder="商品名稱">
+    </div>
+    <div class="form-grid" style="margin-bottom:14px;">
+      <div>
+        <label class="form-label">分類</label>
+        <select class="form-select" id="pCategory">
+          <option>日本雜貨</option><option>韓國服裝</option><option>美妝保養</option>
+          <option>加拿大選物</option><option>玩具系列</option><option>零食・伴手禮</option>
+          <option>母嬰用品</option><option>其他</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">類型</label>
+        <select class="form-select" id="pType">
+          <option value="預購">預購</option>
+          <option value="現貨">現貨</option>
+          <option value="連線">連線</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid" style="margin-bottom:14px;">
+      <div>
+        <label class="form-label">價格（NT$）</label>
+        <input type="number" class="form-input" id="pPrice" placeholder="0">
+      </div>
+      <div>
+        <label class="form-label">Emoji 圖示</label>
+        <input type="text" class="form-input" id="pEmoji" placeholder="🧥" maxlength="4">
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label class="form-label">商品說明</label>
+      <textarea class="form-textarea" id="pDesc" placeholder="商品描述…"></textarea>
+    </div>
+    <div class="form-group" style="margin-bottom:14px;">
+      <label class="form-label">圖片網址（可空白）</label>
+      <input type="text" class="form-input" id="pImage" placeholder="https://…">
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+      <input type="checkbox" id="pActive" checked>
+      <label class="form-label" style="margin-bottom:0;" for="pActive">上架中</label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeProductModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveProduct()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, setDoc, getDoc, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAaba2qOBIfHGG6J4677EDfMGA4ca7FJ0s",
+  authDomain: "calma-nara-c572d.firebaseapp.com",
+  projectId: "calma-nara-c572d",
+  storageBucket: "calma-nara-c572d.firebasestorage.app",
+  messagingSenderId: "612140979871",
+  appId: "1:612140979871:web:3986e63f81289b0f9174aa"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Admin email whitelist
+const ADMIN_EMAILS = ['Calma.nara.tw@gmail.com'];
+
+let allOrders = [], allProducts = [], allMembers = [];
+let editingProductId = null;
+
+// ── Auth ──
+onAuthStateChanged(auth, user => {
+  if (user && ADMIN_EMAILS.includes(user.email)) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'block';
+    loadAll();
+  } else if (user) {
+    signOut(auth);
+    showToast('無管理員權限', 'error');
+  }
+});
+
+window.doAdminLogin = async () => {
+  const email = document.getElementById('adminEmail').value.trim();
+  const pwd = document.getElementById('adminPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.style.display = 'none';
+  try {
+    await signInWithEmailAndPassword(auth, email, pwd);
+  } catch(e) {
+    errEl.style.display = 'block';
+  }
+};
+
+window.doLogout = async () => {
+  await signOut(auth);
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('adminApp').style.display = 'none';
+};
+
+// ── Load All Data ──
+async function loadAll() {
+  document.getElementById('dashDate').textContent = new Date().toLocaleDateString('zh-TW', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
+  await Promise.all([loadOrders(), loadProducts(), loadMembers(), loadSettings()]);
+  renderDashboard();
+}
+
+async function loadOrders() {
+  try {
+    const snap = await getDocs(collection(db, 'orders'));
+    allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    allOrders.sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+    renderOrdersTable(allOrders);
+  } catch(e) { console.error(e); }
+}
+
+async function loadProducts() {
+  try {
+    const snap = await getDocs(collection(db, 'products'));
+    allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderProductsTable(allProducts);
+    document.getElementById('stat-products').textContent = allProducts.filter(p=>p.active!==false).length;
+  } catch(e) { console.error(e); }
+}
+
+async function loadMembers() {
+  try {
+    const snap = await getDocs(collection(db, 'users'));
+    allMembers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderMembersTable(allMembers);
+    document.getElementById('stat-members').textContent = allMembers.length;
+  } catch(e) {
+    document.getElementById('stat-members').textContent = '-';
+  }
+}
+
+async function loadSettings() {
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'site'));
+    if (snap.exists()) {
+      const d = snap.data();
+      if (d.announce) document.getElementById('settingAnnounce').value = d.announce;
+      if (d.rates) {
+        document.getElementById('rateJP').value = d.rates.JP || '';
+        document.getElementById('rateJPCosmetic').value = d.rates.JPCosmetic || '';
+        document.getElementById('rateKR').value = d.rates.KR || '';
+        document.getElementById('rateKRCosmetic').value = d.rates.KRCosmetic || '';
+        document.getElementById('rateCA').value = d.rates.CA || '';
+      }
+      if (d.banners) renderBannerList(d.banners);
+    }
+  } catch(e) {}
+}
+
+// ── Dashboard ──
+function renderDashboard() {
+  const total = allOrders.length;
+  const pending = allOrders.filter(o => o.status === '待採購').length;
+  document.getElementById('stat-orders').textContent = total;
+  document.getElementById('stat-pending').textContent = pending;
+  const recent = allOrders.slice(0, 5);
+  document.getElementById('recentOrdersTable').innerHTML = renderOrderRows(recent) || '<div class="empty-state"><div class="icon">📋</div><p>目前沒有訂單</p></div>';
+}
+
+// ── Orders ──
+function renderOrderRows(orders) {
+  if (!orders.length) return '<div class="empty-state"><div class="icon">📋</div><p>沒有符合的訂單</p></div>';
+  return `<table>
+    <thead><tr><th>商品</th><th>類型</th><th>金額</th><th>狀態</th><th>時間</th><th>操作</th></tr></thead>
+    <tbody>${orders.map(o => {
+      const dt = o.createdAt ? new Date(o.createdAt.seconds*1000).toLocaleDateString('zh-TW') : '-';
+      const statusClass = {'待採購':'badge-pending','已採購':'badge-bought','已出貨':'badge-shipped','已取消':'badge-cancelled'}[o.status] || 'badge-pending';
+      return `<tr>
+        <td><strong>${o.name||'-'}</strong><br><span style="font-size:12px;color:var(--text-muted)">${o.uid||''}</span></td>
+        <td><span class="badge ${o.type==='預購'?'badge-preorder':'badge-instock'}">${o.type||'預購'}</span></td>
+        <td><strong>$${Number(o.price||0).toLocaleString()}</strong></td>
+        <td>
+          <select class="status-select" onchange="updateOrderStatus('${o.id}', this.value)">
+            <option ${o.status==='待採購'?'selected':''}>待採購</option>
+            <option ${o.status==='已採購'?'selected':''}>已採購</option>
+            <option ${o.status==='已出貨'?'selected':''}>已出貨</option>
+            <option ${o.status==='已取消'?'selected':''}>已取消</option>
+          </select>
+        </td>
+        <td style="font-size:12px;color:var(--text-muted)">${dt}</td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteOrder('${o.id}')">刪除</button></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+
+function renderOrdersTable(orders) {
+  document.getElementById('ordersTable').innerHTML = renderOrderRows(orders);
+}
+
+window.filterOrders = () => {
+  const status = document.getElementById('orderFilterStatus').value;
+  const search = document.getElementById('orderSearch').value.toLowerCase();
+  let filtered = allOrders;
+  if (status) filtered = filtered.filter(o => o.status === status);
+  if (search) filtered = filtered.filter(o => (o.name||'').toLowerCase().includes(search) || (o.uid||'').toLowerCase().includes(search));
+  renderOrdersTable(filtered);
+};
+
+window.updateOrderStatus = async (id, status) => {
+  try {
+    await updateDoc(doc(db, 'orders', id), { status });
+    const o = allOrders.find(o => o.id === id);
+    if (o) o.status = status;
+    showToast('訂單狀態已更新', 'success');
+    renderDashboard();
+  } catch(e) { showToast('更新失敗', 'error'); }
+};
+
+window.deleteOrder = async (id) => {
+  if (!confirm('確定要刪除此訂單？')) return;
+  try {
+    await deleteDoc(doc(db, 'orders', id));
+    allOrders = allOrders.filter(o => o.id !== id);
+    renderOrdersTable(allOrders);
+    renderDashboard();
+    showToast('訂單已刪除', 'success');
+  } catch(e) { showToast('刪除失敗', 'error'); }
+};
+
+// ── Products ──
+function renderProductsTable(products) {
+  if (!products.length) {
+    document.getElementById('productsTable').innerHTML = '<div class="empty-state"><div class="icon">📦</div><p>還沒有商品，點右上角新增</p></div>';
+    return;
+  }
+  document.getElementById('productsTable').innerHTML = `<table>
+    <thead><tr><th>商品</th><th>分類</th><th>類型</th><th>價格</th><th>狀態</th><th>操作</th></tr></thead>
+    <tbody>${products.map(p => `<tr>
+      <td><span style="font-size:20px;margin-right:8px;">${p.emoji||'📦'}</span><strong>${p.name}</strong></td>
+      <td style="font-size:13px;">${p.category||'-'}</td>
+      <td><span class="badge ${p.type==='預購'?'badge-preorder':'badge-instock'}">${p.type||'預購'}</span></td>
+      <td><strong>$${Number(p.price||0).toLocaleString()}</strong></td>
+      <td><span class="badge ${p.active!==false?'badge-bought':'badge-cancelled'}">${p.active!==false?'上架中':'已下架'}</span></td>
+      <td style="display:flex;gap:6px;">
+        <button class="btn btn-ghost btn-sm" onclick="openProductModal('${p.id}')">編輯</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">刪除</button>
+      </td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+window.filterProducts = (val) => {
+  const filtered = allProducts.filter(p => p.name?.toLowerCase().includes(val.toLowerCase()));
+  renderProductsTable(filtered);
+};
+
+window.openProductModal = (id) => {
+  editingProductId = id || null;
+  document.getElementById('productModalTitle').textContent = id ? '編輯商品' : '新增商品';
+  if (id) {
+    const p = allProducts.find(p => p.id === id);
+    if (p) {
+      document.getElementById('pName').value = p.name||'';
+      document.getElementById('pCategory').value = p.category||'日本雜貨';
+      document.getElementById('pType').value = p.type||'預購';
+      document.getElementById('pPrice').value = p.price||'';
+      document.getElementById('pEmoji').value = p.emoji||'';
+      document.getElementById('pDesc').value = p.desc||'';
+      document.getElementById('pImage').value = p.image||'';
+      document.getElementById('pActive').checked = p.active!==false;
+    }
+  } else {
+    ['pName','pPrice','pEmoji','pDesc','pImage'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('pActive').checked = true;
+  }
+  document.getElementById('productModal').style.display = 'flex';
+};
+
+window.closeProductModal = () => { document.getElementById('productModal').style.display = 'none'; };
+
+window.saveProduct = async () => {
+  const data = {
+    name: document.getElementById('pName').value.trim(),
+    category: document.getElementById('pCategory').value,
+    type: document.getElementById('pType').value,
+    price: Number(document.getElementById('pPrice').value),
+    emoji: document.getElementById('pEmoji').value.trim() || '📦',
+    desc: document.getElementById('pDesc').value.trim(),
+    image: document.getElementById('pImage').value.trim(),
+    active: document.getElementById('pActive').checked,
+    updatedAt: serverTimestamp()
+  };
+  if (!data.name) { showToast('請填寫商品名稱', 'error'); return; }
+  try {
+    if (editingProductId) {
+      await updateDoc(doc(db, 'products', editingProductId), data);
+      const idx = allProducts.findIndex(p => p.id === editingProductId);
+      if (idx >= 0) allProducts[idx] = { ...allProducts[idx], ...data };
+      showToast('商品已更新', 'success');
+    } else {
+      const ref = await addDoc(collection(db, 'products'), { ...data, createdAt: serverTimestamp() });
+      allProducts.unshift({ id: ref.id, ...data });
+      showToast('商品已新增', 'success');
+    }
+    renderProductsTable(allProducts);
+    document.getElementById('stat-products').textContent = allProducts.filter(p=>p.active!==false).length;
+    closeProductModal();
+  } catch(e) { showToast('儲存失敗：' + e.message, 'error'); }
+};
+
+window.deleteProduct = async (id) => {
+  if (!confirm('確定刪除此商品？')) return;
+  try {
+    await deleteDoc(doc(db, 'products', id));
+    allProducts = allProducts.filter(p => p.id !== id);
+    renderProductsTable(allProducts);
+    showToast('商品已刪除', 'success');
+  } catch(e) { showToast('刪除失敗', 'error'); }
+};
+
+// ── Members ──
+function renderMembersTable(members) {
+  if (!members.length) {
+    document.getElementById('membersTable').innerHTML = '<div class="empty-state"><div class="icon">👥</div><p>還沒有會員資料</p></div>';
+    return;
+  }
+  document.getElementById('membersTable').innerHTML = `<table>
+    <thead><tr><th>名稱</th><th>Email</th><th>UID</th><th>加入時間</th></tr></thead>
+    <tbody>${members.map(m => {
+      const dt = m.createdAt ? new Date(m.createdAt.seconds*1000).toLocaleDateString('zh-TW') : '-';
+      return `<tr>
+        <td><strong>${m.displayName||m.name||'未設定'}</strong></td>
+        <td style="font-size:13px;">${m.email||'-'}</td>
+        <td style="font-size:11px;color:var(--text-muted);font-family:monospace;">${m.id}</td>
+        <td style="font-size:13px;color:var(--text-muted)">${dt}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
+}
+
+window.filterMembers = (val) => {
+  const filtered = allMembers.filter(m =>
+    (m.displayName||m.name||'').toLowerCase().includes(val.toLowerCase()) ||
+    (m.email||'').toLowerCase().includes(val.toLowerCase())
+  );
+  renderMembersTable(filtered);
+};
+
+// ── Settings ──
+window.saveSetting = async (type) => {
+  try {
+    const ref = doc(db, 'settings', 'site');
+    if (type === 'announce') {
+      await setDoc(ref, { announce: document.getElementById('settingAnnounce').value }, { merge: true });
+      showToast('公告已儲存', 'success');
+    } else if (type === 'rates') {
+      await setDoc(ref, { rates: {
+        JP: document.getElementById('rateJP').value,
+        JPCosmetic: document.getElementById('rateJPCosmetic').value,
+        KR: document.getElementById('rateKR').value,
+        KRCosmetic: document.getElementById('rateKRCosmetic').value,
+        CA: document.getElementById('rateCA').value,
+      }}, { merge: true });
+      showToast('匯率已儲存', 'success');
+    } else if (type === 'banners') {
+      const rows = document.querySelectorAll('.banner-row');
+      const banners = Array.from(rows).map(r => ({
+        label: r.querySelector('.b-label').value,
+        title: r.querySelector('.b-title').value,
+        sub: r.querySelector('.b-sub').value,
+        emoji: r.querySelector('.b-emoji').value,
+        color: r.querySelector('.b-color').value,
+      }));
+      await setDoc(ref, { banners }, { merge: true });
+      showToast('Banner 已儲存', 'success');
+    }
+  } catch(e) { showToast('儲存失敗', 'error'); }
+};
+
+function renderBannerList(banners) {
+  const el = document.getElementById('bannerList');
+  el.innerHTML = '';
+  banners.forEach(b => addBannerRow(b));
+}
+
+window.addBannerRow = (b) => {
+  const el = document.getElementById('bannerList');
+  const div = document.createElement('div');
+  div.className = 'banner-row';
+  div.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr 80px 80px 40px;gap:8px;margin-bottom:10px;align-items:center;';
+  div.innerHTML = `
+    <input class="form-input b-label" placeholder="標籤（如：日本連線）" value="${b?.label||''}">
+    <input class="form-input b-title" placeholder="標題" value="${b?.title||''}">
+    <input class="form-input b-sub" placeholder="副標題" value="${b?.sub||''}">
+    <input class="form-input b-emoji" placeholder="🇯🇵" value="${b?.emoji||''}" style="text-align:center;">
+    <input type="color" class="form-input b-color" value="${b?.color||'#EDE0D0'}" style="padding:4px;height:42px;">
+    <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">✕</button>
+  `;
+  el.appendChild(div);
+};
+</script>
+
+<script>
+// ── Panel Nav ──
+window.showPanel = (name) => {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.textContent.includes({dashboard:'總覽',orders:'訂單',products:'商品',members:'會員',settings:'公告'}[name]||''))
+      n.classList.add('active');
+  });
+};
+
+// ── Toast ──
+let toastTimer;
+window.showToast = (msg, type) => {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+};
+</script>
+</body>
+</html>
